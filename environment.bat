@@ -7,8 +7,9 @@
 
 echo Running in %CD%
 
-:: Open VsCode
+:: Open VsCode and file explorer
 call code .
+start explorer .
 
 :: Open into python virtual enviroment
 call .venv\scripts\activate

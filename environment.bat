@@ -18,12 +18,13 @@ py ./modules/testEnviroment.py
 :loop
 :: Prompt for filename
 set /p filename=Enter python filename:
+if /i "%filename%"=="exit" goto exit
 
 :: Run python file
 py %filename%.py
 
 :: Loop back
 goto loop
-
+:exit
 :: Keep window open
 cmd

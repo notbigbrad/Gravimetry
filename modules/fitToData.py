@@ -7,6 +7,9 @@ def fit(filename, l0, dl, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, cameraR
     # Import dataset
     time, x, _ = np.loadtxt(f'./data/{filename}.txt', delimiter=",", encoding="utf-8-sig").T
 
+    print("=====================")
+    print(x)
+    print("=====================")
     # Remove initial outlier data
     time = time[cut::]*(cameraRate/videoRate) # convert from slo-mo seconds to real seconds
     x = x[cut::]

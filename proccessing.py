@@ -21,20 +21,26 @@ s = 0.248 / 2
 leff = np.sqrt(l ** 2 - s ** 2)
 lcov = 0.01
 
+
 # Initialise arrays
 g = []
+
+
+g.append(fit("bradDat1", leff, lcov, 0.05, np.pi / 2 + 0.4, 500, 29.97, 240))
+g.append(fit("bradDat2", leff, lcov, 0.05, np.pi / 2 + 0.4, 500, 29.97, 240, doPlot=True))
+g.append(fit("matDat1", leff, lcov, 0.05, np.pi / 2))
+g.append(fit("nicoleDat1", leff, lcov, 0.05, np.pi / 2 - 1.8, 0))
+
 
 # Set known data
 # l = 0.733 # not to cm?
 leff = 0.737  # compensation for ball diameter of ~40mm
-lcov = 0.01
+lcov = 0.002
 
-g.append(fit("bradDat1", leff, lcov, 0.05, np.pi / 2 + 0.4, 500, 29.97, 240))
-g.append(fit("bradDat2", leff, lcov, 0.05, np.pi / 2 + 0.4, 500, 29.97, 240))
-g.append(fit("matDat1", leff, lcov, 0.05, np.pi / 2))
-g.append(fit("nicoleDat1", leff, lcov, 0.05, np.pi / 2 - 1.8, 0))
-g.append(fit("hopeDat1", leff, lcov, 0.05, np.pi / 2, doPlot=True))
-g.append(fit("caityDat1", leff, lcov, 0.05, np.pi / 2 - 1.8))
+g.append(fit("hopeDat1", leff, lcov,0.05, np.pi / 2, doPlot=True, cut=0))
+
+#g.append(fit("caityDat1", leff, lcov, 0.05, np.pi / 2 - 1.8))
+
 
 x = np.linspace(0, len(g) - 1, len(g))
 z = np.linspace(0, len(g) - 1, 1000)
@@ -56,6 +62,7 @@ plt.plot(z, f(z, optimal[0]), label="Least Squares Fit")
 plt.plot(z, f(z, 9.81616), linestyle="--", color="green", label="Theoretical Local g")
 plt.legend()
 plt.show()
+
 
 print(f'FINAL g VALUE FOR FIRST DATA USING MATHEMATICAL PENDULUM')
 print(f'g: {optimal[0]} +- {err} ms^-2')

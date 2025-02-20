@@ -2,12 +2,7 @@
 # FOR TESTING PURPOSES
 
 import numpy as np
-import scipy
-import os
 import matplotlib.pyplot as plt
-import time
-
-import scipy.integrate
 
 def f(x):
     return (x**2)

@@ -5,8 +5,8 @@ import numpy as np
 import scipy
 import matplotlib.pyplot as plt
 
-def mathPendulum(t, A0, gamma, o, phi):
-    exponent = -(t/(4*gamma))
+def physicalPendulum(t, A0, gamma, o, phi):
+    exponent = -(t*gamma)
     a = (o*t - phi)
     return (A0*np.exp(exponent)*np.cos(a))
 
@@ -22,5 +22,5 @@ def demo():
     angle = 0
     x = np.linspace(0,25,10000)
     plt.figure(figsize=[5,10])
-    plt.plot(x,mathPendulum(x, amplitude, dampingFactor, o, angle))
+    plt.plot(x,physicalPendulum(x, amplitude, dampingFactor, o, angle))
     plt.show()

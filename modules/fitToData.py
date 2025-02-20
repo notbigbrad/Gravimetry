@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from modules.model import sin as sin
 from modules.model import physicalPendulum as model
 
-def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, cameraRate=60, videoRate=60, doPlot=True):
+def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, cameraRate=60, videoRate=60, focalLength=(24*1920)/8, doPlot=False):
     # Import dataset
     time, x, _ = np.loadtxt(f'./data/{filename}.txt', delimiter=",", encoding="utf-8-sig").T
 
@@ -13,14 +13,14 @@ def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, camera
     x = x[cut::]
     
     # Apply imaging correction
-    f = (24*1920)/8
-    x = np.arctan(x/f)
+    # focalLength (px) = focalLength (mm) * width (px) / width (mm)
+    x = np.arctan(x/focalLength)
 
     # Normalise the data
     x = x-np.min(x)
     x = x-np.max(x)/2
     x = x/np.max(x)
-
+    
     # Initial guesses
     I = [1, 0.1, np.sqrt(9.81/l), phaseGuess] # A0, gamma, omega, phi
 
@@ -42,14 +42,14 @@ def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, camera
         plt.title(filename)
         plt.axis("off")
         plt.subplot(211)
-        plt.title("Data Plot with Fitted Model")
+        plt.suptitle("Data Plot with Fitted Model")
         plt.fill_between(time, x-trackingErr, x+trackingErr, color="lightgray")
         plt.scatter(time, x, color="red", marker="+", linewidths=1, label="Data")
         plt.plot(tSpace, model(tSpace, optimal[0], optimal[1], optimal[2], optimal[3]), label="Mathematical Pendulum Model")
         plt.plot(tSpace, sin(tSpace, np.sqrt(9.81/l), 0), "g--", label="Theoretical")
         plt.legend()
         plt.subplot(212)
-        plt.title("Residual Plot")
+        plt.suptitle("Residual Plot")
         plt.plot(time, x*0.05, color="lightgray")
         plt.plot(time, r, color="black")
         plt.show()

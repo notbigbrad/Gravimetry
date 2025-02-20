@@ -13,7 +13,7 @@ def f(t, c): return c + t * 0
 # Set known data
 l = 0.735  # compensation for ball diameter of ~40mm
 s = 0.248 / 2
-leff = np.sqrt(l ** 2 - s ** 2)
+leff = np.sqrt(l**2 - s**2)
 lstd = 0.01
 
 # Initialise arrays

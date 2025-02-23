@@ -6,7 +6,7 @@ from modules.model import physicalPendulum as model
 
 def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, cameraRate=60, videoRate=60, focalLength=(24*1920)/8, doPlot=False):
     # Import dataset
-    time, x, _ = np.loadtxt(f'./data/{filename}.txt', delimiter=",", encoding="utf-8-sig").T
+    time, x, _ = np.loadtxt(f'./data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T
 
     # Remove initial outlier data
     time = time[cut::]*(cameraRate/videoRate) # convert from slo-mo seconds to real seconds

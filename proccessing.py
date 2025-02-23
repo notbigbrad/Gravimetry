@@ -3,32 +3,38 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy
 from modules.fitToData import fit
+from modules.least_squares_tools import residuals_f
 
-# Gather all names
-fileNames = os.listdir('./data')
+# ------ SETUP ---------
+fileNames = os.listdir('./data/')
+fitting_func = scipy.optimize.curve_fit
+g = []
+OLD_DATA_TEST = False
+# ----------------------
+if OLD_DATA_TEST:
+    # Set known data
+    l = 0.735  # compensation for ball diameter of ~40mm
+    s = 0.248 / 2
+    leff = np.sqrt(l ** 2 - s ** 2)
+    lstd = 0.01
+
+    # Initialise arrays
+
+    g.append(fit("bradDat1", leff, lstd, 0.05, np.pi / 2 + 0.4, 500, 29.97, 240))
+    g.append(fit("bradDat2", leff, lstd, 0.05, np.pi / 2 + 0.4, 500, 29.97, 240))
+    g.append(fit("matDat1", leff, lstd, 0.05, np.pi / 2))
+    g.append(fit("nicoleDat1", leff, lstd, 0.05, np.pi / 2 - 1.8, 0))
+
+    # Set known data
+    leff = 0.737
+    lstd = 0.005
+
+    g.append(fit("hopeDat1", leff, lstd, 0.05, np.pi / 2, 0))
 
 # Constant function
 def f(t, c): return c + t * 0
 
-# Set known data
-l = 0.735  # compensation for ball diameter of ~40mm
-s = 0.248 / 2
-leff = np.sqrt(l**2 - s**2)
-lstd = 0.01
 
-# Initialise arrays
-g = []
-
-g.append(fit("bradDat1", leff, lstd, 0.05, np.pi/2+0.4, 500, 29.97, 240))
-g.append(fit("bradDat2", leff, lstd, 0.05, np.pi/2+0.4, 500, 29.97, 240))
-g.append(fit("matDat1", leff, lstd, 0.05, np.pi/2))
-g.append(fit("nicoleDat1", leff, lstd, 0.05, np.pi/2-1.8, 0))
-
-# Set known data
-leff = 0.737
-lstd = 0.005
-
-g.append(fit("hopeDat1", leff, lstd, 0.05, np.pi/2, 0))
 
 x = np.linspace(0, len(g) - 1, len(g))
 z = np.linspace(0, len(g) - 1, 1000)

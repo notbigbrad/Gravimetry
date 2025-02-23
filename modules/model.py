@@ -2,7 +2,6 @@
 # ONLY MAKE CHANGES TO COPY
 
 import numpy as np
-import scipy
 import matplotlib.pyplot as plt
 
 def physicalPendulum(t, A0, gamma, o, phi):

@@ -1,8 +1,7 @@
+from modules.final_result_plotter import do_plot, plot_now
+from modules.model import physicalPendulum as model
 import numpy as np
 import scipy
-import matplotlib.pyplot as plt
-from modules.model import sin as sin
-from modules.model import physicalPendulum as model
 
 def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, cameraRate=60, videoRate=60, focalLength=(24*1920)/8, doPlot=False):
     # Import dataset
@@ -38,6 +37,7 @@ def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, camera
     tSpace = np.linspace(np.min(time),np.max(time),10000)
 
     if(doPlot):
+        do_plot(filename, time, x, trackingErr, tSpace, optimal, l, r)
         plt.figure(figsize=[15,10])
         plt.title(filename)
         plt.axis("off")

@@ -3,25 +3,29 @@ import re
 import numpy as np
 import scipy
 from modules.fitToData import fit
-from modules.least_squares_tools import residuals_f
+from modules import curve_fit
+from modules import least_squares_fit
 from modules.final_result_plotter import plot_now
 
 # ------ SETUP ---------
 fileNames = os.listdir('./data/')
+REGEX_PATTERN = r"^set\d+\.csv$"
 fitting_func = scipy.optimize.curve_fit
 g = []
+
 OLD_DATA_TEST = True
 DO_PLOT = False
-REGEX_PATTERN = r"^set\d+\.csv$"
 
 # Constant function
 def f(t, c): return c + t * 0
 
 
+
+
+
 # ---PARAMETER CONFIG---
 vertical = 2.015
 vertical_accuracy = 0.005
-
 
 # ---- DATASETS ----
 if OLD_DATA_TEST:
@@ -46,17 +50,23 @@ if OLD_DATA_TEST:
 
 for filename in fileNames:
     if re.match(REGEX_PATTERN, filename):
-        g.append(fit(filename.split(".")[0], vertical, vertical_accuracy, 0.05, np.pi / 2, 0, doPlot=DO_PLOT))
-
-
+        g.append(fit(filename.split(".")[0], vertical, vertical_accuracy,
+                     0.05, np.pi / 2, 0, doPlot=DO_PLOT))
 
 
 x = np.linspace(0, len(g) - 1, len(g))
 z = np.linspace(0, len(g) - 1, 1000)
 g = np.array(g)
 
-optimal, covariance = fitting_func(f, x, g.T[0], p0=[9.81], sigma=g.T[1], absolute_sigma=True, maxfev=1 * 10 ** 9)
+
+if fitting_func is scipy.optimize.curve_fit:
+    optimal, covariance = fitting_func(f, x, g.T[0], p0=[9.81], sigma=g.T[1], absolute_sigma=True, maxfev=1 * 10 ** 9)
+elif fitting_func is scipy.optimize.least_squares:
+    # optimal, covariance =
+    pass
+
 err = np.sqrt(np.diag(covariance))[0]
+std_err = np.sqrt(np.diag(covariance)/len(g))[0]
 
 plot_now(x, z, f, g, optimal, err)
 

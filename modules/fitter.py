@@ -2,8 +2,8 @@ import scipy.optimize
 from modules.model import *
 from modules.plotter import *
 
-def fitting_dataset(filename, l, l_error, tracking_err=0.05, phase_guess=np.pi / 2, cut=500,
-                    camera_rate=60, video_rate=60, focal_length=(24 * 1920) / 8, do_plot=False):
+def fitting_dataset(filename, l, l_error, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,
+                    camera_rate=60, video_rate=60, focal_length=(24 * 1920) / 8, model=physicalPendulum, do_plot=False):
 
     #----------- FITTING PARAMETERS -----------
     bounds = [[0.99,0.0001,0.1,-np.pi],[1.01,100,10,np.pi]]
@@ -22,18 +22,18 @@ def fitting_dataset(filename, l, l_error, tracking_err=0.05, phase_guess=np.pi /
 
     #----------- FITTING & RESIDUALS -----------
     optimal, covariance = (scipy.optimize.curve_fit
-                           (physicalPendulum, time, x,
-                            p0=initial_guess, bounds=bounds, sigma=tracking_err,
+                           (model, time, x,
+                            p0=initial_guess, bounds=bounds, sigma=tracking_error,
                             absolute_sigma=True, maxfev=1*10**9))
 
     space = np.linspace(np.min(time), np.max(time), len(time))
-    r = x - physicalPendulum(space, optimal[0], optimal[1], optimal[2], optimal[3])     # Residuals
+    r = x - model(space, optimal[0], optimal[1], optimal[2], optimal[3])     # Residuals
 
     #----------- PLOTTING (OPTIONAL) -----------
     if do_plot:
-        do_plot_go(filename, time, x, tracking_err, optimal, l, r)
+        do_plot_go(filename, time, x, tracking_error, optimal, l, r, model)
 
-    # ----------- PARAMETER EXTRACTION -----------
+    # ----------- PARAMETER EXTRACTION FOR G -----------
 
     gamma = optimal[1]
     omega = optimal[2]
@@ -56,11 +56,10 @@ def fitting_g(g):
     g = np.array(g)
 
     optimal, covariance = scipy.optimize.curve_fit(f, x, g.T[0], p0=[9.81], sigma=g.T[1],
-
                                                    absolute_sigma=True, maxfev=1 * 10 ** 9)
     fitted_g = optimal[0]
     g_standard_deviation = np.sqrt(np.diag(covariance))[0]
-    g_standard_error = np.sqrt(np.diag(covariance) / len(g))
+    g_standard_error = g_standard_deviation / np.sqrt(len(g))
 
     plot_now(x, z, f, g, fitted_g, g_standard_deviation, g_standard_error)
 

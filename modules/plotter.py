@@ -1,4 +1,4 @@
-from modules.model import physicalPendulum as model, sin, f
+from modules.model import physicalPendulum as physical_pendulum, sin, f
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,7 +16,7 @@ def plot_now(x, z, f, g, fitted_g, g_standard_deviation, g_standard_error):
     plt.legend()
     plt.show()
 
-def do_plot_go(filename, time, x, trackingErr, optimal, l, r):
+def do_plot_go(filename, time, x, trackingErr, optimal, l, r, model):
     tSpace = np.linspace(np.min(time), np.max(time), 10000)
     plt.figure(figsize=[15, 10])
     plt.title(filename)

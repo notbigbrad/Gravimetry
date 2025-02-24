@@ -25,7 +25,7 @@ def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, camera
     I = [1, 0.1, np.sqrt(9.81/l), phaseGuess] # A0, gamma, omega, phi
 
     # Bounds
-    bounds = [[0.99,0.0001,0.1,-np.pi],[1.01,100,10,np.pi]] # bounds on the fitting function
+    bounds = [[0.99,0.0001,0.1,-np.pi],[1.01,10,10,np.pi]] # bounds on the fitting function
 
     # Fit model
     optimal, covariance = scipy.optimize.curve_fit(model, time, x, p0=I, bounds=bounds, sigma=trackingErr, absolute_sigma=True, maxfev=1*10**9)

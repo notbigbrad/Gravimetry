@@ -2,9 +2,10 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
-from compound import comp
+# from compound import comp
 from doubleString import ds
 from modules.fitToData import fit
+from modules.errorProp import *
 
 # Constant function
 def f(t, c): return c + t * 0
@@ -12,8 +13,8 @@ def f(t, c): return c + t * 0
 _, _, d = ds()
 lds = len(d)
 # _, _, c = comp()
-c = []
-g = np.concatenate(d,c)
+# g = np.concatenate((c,d))
+g = d
 
 x = np.linspace(0, len(g) - 1, len(g))
 
@@ -36,4 +37,4 @@ plt.plot(z, f(z, 9.81616), linestyle="--", color="green", label="Theoretical Loc
 plt.legend()
 plt.show()
 
-print(f'Double string g: {optimal[0]:.5f} +- {gstd:.6f} ms^-2')
+print(f'Final g: {optimal[0]:.5f} +- {gstd:.6f} ms^-2')

@@ -25,5 +25,3 @@ def demo():
     plt.figure(figsize=[10,5])
     plt.plot(x,physicalPendulum(x, amplitude, dampingFactor, o, angle))
     plt.show()
-
-demo()

@@ -3,10 +3,16 @@ import scipy
 import matplotlib.pyplot as plt
 from modules.model import sin as sin
 from modules.model import physicalPendulum as model
+from modules.errorProp import *
 
-def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, cameraRate=60, videoRate=60, focalLength=(24*1920)/8, doPlot=False):
+def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, cameraRate=60, videoRate=60, focalLength=(24*1920)/8, doPlot=False, I0=False, r0=False, m=0.109):
+    
+    # Default values for non-physical pendulum mode
+    if(I0==False): I0 = m*l**2
+    if(r0==False): r0 = l
+    
     # Import dataset
-    time, x, _ = np.loadtxt(f'./data/{filename}.txt', delimiter=",", encoding="utf-8-sig").T
+    time, x, _ = np.loadtxt(f'./data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T
 
     # Remove initial outlier data
     time = time[cut::]*(cameraRate/videoRate) # convert from slo-mo seconds to real seconds
@@ -36,15 +42,13 @@ def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, camera
     # Find natural frequency
     # o^2 = o0^2 - gamma^2
     o0 = np.sqrt(optimal[2]**2 + optimal[1]**2)
-    o0Variance = covariance[2,2]*(optimal[2]/o0)**2 + covariance[1,1]*(optimal[1]/o0)**2 + 2*(optimal[1]*optimal[2]/o0**2)*covariance[1,2]
+    o0Std = sqrt(o0,optimal[2],optimal[1],np.sqrt(covariance[2,2]),np.sqrt(covariance[1,1]),np.sqrt(covariance[1,2]), "+")**2
    
     # Calculate g
-    # o^2 = g/l
-    g = (o0**2)*l
-    gVariance = g**2*((o0Variance/o0)**2+(lStd/l)**2)
-    
-    # Convert variance to std. dev.
-    gStd = np.sqrt(gVariance)
+    # o0^2 = mgro+ / I0
+    # g = o0^2*I0 / mro+
+    g = (o0**2*I0)/(m*r0)
+    gStd = 0.01  # ERROR PROP CODE -------------------------------------
     print(f'g: {g} +- {gStd} ms^-2')
 
     # Calculate residuals

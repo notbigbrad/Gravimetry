@@ -19,16 +19,16 @@ lstd = 0.01
 # Initialise arrays
 g = []
 
-g.append(fit("bradDat1", leff, lstd, 0.05, np.pi/2+0.4, 500, 29.97, 240))
-g.append(fit("bradDat2", leff, lstd, 0.05, np.pi/2+0.4, 500, 29.97, 240))
-g.append(fit("matDat1", leff, lstd, 0.05, np.pi/2))
-g.append(fit("nicoleDat1", leff, lstd, 0.05, np.pi/2-1.8, 0))
+g.append(fit("exp1/bradDat1", leff, lstd, 0.05, np.pi/2+0.4, 500, 29.97, 240))
+g.append(fit("exp1/bradDat2", leff, lstd, 0.05, np.pi/2+0.4, 500, 29.97, 240))
+g.append(fit("exp1/matDat1", leff, lstd, 0.05, np.pi/2))
+g.append(fit("exp1/nicoleDat1", leff, lstd, 0.05, np.pi/2-1.8, 0))
 
 # Set known data
 leff = 0.737
 lstd = 0.005
 
-g.append(fit("hopeDat1", leff, lstd, 0.05, np.pi/2, 0))
+g.append(fit("exp1/hopeDat1", leff, lstd, 0.05, np.pi/2, 0))
 
 x = np.linspace(0, len(g) - 1, len(g))
 z = np.linspace(0, len(g) - 1, 1000)

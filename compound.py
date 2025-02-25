@@ -1,23 +1,27 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
-from modules.fitToData import fit
+from modules.fitToData import fi
+from modules.errorProp import *
 
 # Constant function
 def f(t, c): return c + t * 0
 
 def comp():
     # Find I0
-    ballm = 0.4
-    ballOffset = 1.000
-    rodm = 0.2
-    rodL = 1.000
-    rodOffset = 0.020
-    I0 = ballm*ballOffset**2 + 1/12*rodm*(rodL+rodOffset)**2 - 1/12*rodm*rodOffset**2
-
+    ballm = 0.109 # pm 0.2
+    ballOffset = np.sqrt((1.000-0.030/2)**2 + (0.030/2)**2)
+    rodm = 0.1116 # pm 0.2g
+    rodL = 1.000 # pm 4mm
+    rodOffset = 0.0095 # pm 0.2mm
+    rodLinDens = rodm/rodL
+    I0 = ballm*ballOffset**2 + 1/3*rodLinDens*(rodL+rodOffset)*(rodL+rodOffset)**2 - 1/3*rodLinDens*rodOffset*rodOffset**2
+    print(f'I0: {I0}')
+    
     # Find ro+
-
-
+    r0 = 0.5 # NEEDS PROPER CALCULATION
+    print(f'ro+: {r0}')
+    
     # Fit g values
     g = []
 
@@ -28,18 +32,6 @@ def comp():
 
     optimal, covariance = scipy.optimize.curve_fit(f, x, g.T[0], p0=[9.81], sigma=g.T[1], absolute_sigma=True, maxfev=1*10**9)
     gstd = np.sqrt(np.diag(covariance))[0]
-
-    plt.figure(figsize=[10, 5])
-    plt.suptitle(f'g: {optimal[0]:.5f} +- {gstd:.6f} ms^-2')
-    plt.title(f'Measured values for g')
-    plt.ylabel(f'g (ms^-2)')
-    plt.fill_between(x, g.T[0] - g.T[1], g.T[0] + g.T[1], color="lightcoral", alpha=0.3)
-    plt.errorbar(x, g.T[0], yerr=g.T[1], color="red", marker="+", capsize=5, capthick=1, label="Data", linewidth=0, elinewidth=1)
-    plt.fill_between(z, f(z, optimal[0] - gstd), f(z, optimal[0] + gstd), color="lightskyblue", alpha=0.3)
-    plt.plot(z, f(z, optimal[0]), label="Least Squares Fit")
-    plt.plot(z, f(z, 9.81616), linestyle="--", color="green", label="Theoretical Local g")
-    plt.legend()
-    plt.show()
 
     print(f'Compound g: {optimal[0]:.5f} +- {gstd:.6f} ms^-2')
 

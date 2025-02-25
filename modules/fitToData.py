@@ -5,7 +5,7 @@ from modules.model import sin as sin
 from modules.model import physicalPendulum as model
 from modules.errorProp import *
 
-def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, cameraRate=60, videoRate=60, focalLength=(24*1920)/8, doPlot=False, I0=False, r0=False, m=0.109):
+def fit(filename, l, lstd=False, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, cameraRate=60, videoRate=60, focalLength=(24*1920)/8, doPlot=False, I0=False, r0=False, m=0.109, r0Std=0.01, I0Std=0.01, mStd=0.004):
     
     # Default values for non-physical pendulum mode
     if(I0==False): I0 = m*l**2
@@ -31,7 +31,7 @@ def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, camera
     I = [1, 0.1, np.sqrt(9.81/l), phaseGuess] # A0, gamma, omega, phi
 
     # Bounds
-    bounds = [[0.99,0.0001,0.1,-np.pi],[1.01,10,10,np.pi]] # bounds on the fitting function
+    bounds = [[0.9,0.0001,0.1,-np.pi],[1.2,20,10,np.pi]] # bounds on the fitting function
 
     # Fit model
     optimal, covariance = scipy.optimize.curve_fit(model, time, x, p0=I, bounds=bounds, sigma=trackingErr, absolute_sigma=True, maxfev=1*10**9)
@@ -42,13 +42,29 @@ def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, camera
     # Find natural frequency
     # o^2 = o0^2 - gamma^2
     o0 = np.sqrt(optimal[2]**2 + optimal[1]**2)
-    o0Std = sqrt(o0,optimal[2],optimal[1],np.sqrt(covariance[2,2]),np.sqrt(covariance[1,1]),np.sqrt(covariance[1,2]), "+")**2
-   
+    o0Std = sqrt(o0,optimal[2],optimal[1],np.sqrt(covariance[2,2]),np.sqrt(covariance[1,1]),0, "+") # cov should be np.sqrt(covariance[1,2]) instead 0
+
     # Calculate g
     # o0^2 = mgro+ / I0
     # g = o0^2*I0 / mro+
-    g = (o0**2*I0)/(m*r0)
-    gStd = 0.01  # ERROR PROP CODE -------------------------------------
+    g = float()
+    gStd = float()
+    if(lstd == False):
+        g = (o0**2*I0)/(m*r0)
+        print(squared(o0,o0Std))
+        print(I0Std)
+        print(mStd)
+        print(r0Std)
+        numStd = mul(o0**2*I0,o0**2,I0,squared(o0,o0Std),I0Std,0)
+        denStd = mul(m*r0,m,r0,mStd,r0Std,0)
+        print(numStd)
+        print(denStd)
+        gStd = div(g, o0**2*I0, m*r0, numStd, denStd,0)
+        print(gStd)
+    else:
+        g = (o0**2)*l
+        gStd = mul(g,o0**2,l,squared(o0,o0Std),lstd,0) # Assuming omega0 and l are not covariant
+    
     print(f'g: {g} +- {gStd} ms^-2')
 
     # Calculate residuals
@@ -66,7 +82,7 @@ def fit(filename, l, lStd, trackingErr=0.05, phaseGuess=np.pi/2, cut=500, camera
         plt.fill_between(time, x-trackingErr, x+trackingErr, color="lightgray")
         plt.scatter(time, x, color="red", marker="+", linewidths=1, label="Data")
         plt.plot(tSpace, model(tSpace, optimal[0], optimal[1], optimal[2], optimal[3]), label="Mathematical Pendulum Model")
-        plt.plot(tSpace, sin(tSpace, np.sqrt(9.81/l), 0), "g--", label="Theoretical")
+        # plt.plot(tSpace, sin(tSpace, np.sqrt(9.81/l), 0), "g--", label="Theoretical")
         plt.legend()
         plt.subplot(212)
         plt.title("Residual")

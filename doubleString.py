@@ -27,8 +27,8 @@ def ds():
     g = []
 
     g.append(fit("exp2Dat1", l, lstd, 0.05, np.pi/1, 500, 30, 30, focalLength=(24*1280)/9.8))
-    g.append(fit("exp2Dat2", l, lstd, 0.05, np.pi/2+0.8, 500, 30, 30, focalLength=-2)) # camera compensation off
-    g.append(fit("exp2Dat3", l, lstd, 0.05, np.pi/2+0, 500, 29.97, 30, focalLength=-2)) # camera compensation off
+    g.append(fit("exp2Dat2", l, lstd, 0.05, np.pi/2+0.8, 200, 30, 30, focalLength=-2)) # camera compensation off
+    g.append(fit("exp2Dat3", l, lstd, 0.05, np.pi/2+0, 200, 29.97, 30, focalLength=-2)) # camera compensation off
 
     # Plot Final Data
     x = np.linspace(0, len(g) - 1, len(g))
@@ -40,4 +40,4 @@ def ds():
 
     print(f'Double string g: {optimal[0]:.5f} +- {gstd:.6f} ms^-2')
 
-    return [optimal[0], gstd, g]
+    return g

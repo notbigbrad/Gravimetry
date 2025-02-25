@@ -13,7 +13,7 @@ fitting_func = scipy.optimize.curve_fit
 g = []
 
 OLD_DATA_TEST = False
-DO_PLOT = False
+DO_PLOT = True
 
 # ---PARAMETER CONFIG---
 

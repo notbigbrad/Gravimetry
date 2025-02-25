@@ -6,27 +6,20 @@ from modules.fitToData import fit
 # Constant function
 def f(t, c): return c + t * 0
 
-def ds():
-    # Find l
-    x = np.array([2.010])
-    d = np.array([0.485])/2
-    xvar = 0.005
-    dvar = 0.005
-    L = np.sqrt((x)**2 - (d)**2)
-    Lvar = dvar**2*(d/L)**2+xvar**2*(x/L)**2
-    print(L)
-    print(Lvar)
-    z = np.linspace(0, len(L) - 1, len(L))
-    l, lcov = scipy.optimize.curve_fit(f, z, L, sigma=Lvar, absolute_sigma=True, maxfev=1*10**9)
-    l = l[0]+0.015 # Add width of the ball
-    lstd = np.sqrt(np.diag(lcov))[0] # Ignore error in ball
-    print(f'l: {l} +- {lstd} m')
+def comp():
+    # Find I0
+    ballm = 0.4
+    ballOffset = 1.000
+    rodm = 0.2
+    rodL = 1.000
+    rodOffset = 0.020
+    I0 = ballm*ballOffset**2 + 1/12*rodm*(rodL+rodOffset)**2 - 1/12*rodm*rodOffset**2
+
+    # Find ro+
+
 
     # Fit g values
     g = []
-
-    g.append(fit("exp2Dat1", l, lstd, 0.05, np.pi/1, 500, 30, 30, doPlot=True, focalLength=(24*1280)/9.8))
-    g.append(fit("exp2Dat1", l, lstd, 0.05, np.pi/2+1.4, 500, 30, 30, doPlot=True, focalLength=-2)) # camera compensation off
 
     # Plot Final Data
     x = np.linspace(0, len(g) - 1, len(g))
@@ -48,6 +41,6 @@ def ds():
     plt.legend()
     plt.show()
 
-    print(f'Double string g: {optimal[0]:.5f} +- {gstd:.6f} ms^-2')
+    print(f'Compound g: {optimal[0]:.5f} +- {gstd:.6f} ms^-2')
 
     return [optimal[0], gstd, g]

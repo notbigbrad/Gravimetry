@@ -12,19 +12,19 @@ call code .
 start explorer .
 
 :: Open into python virtual enviroment
-call .venv\scripts\activate
-py ./modules/testEnviroment.py
+@REM call .venv\scripts\activate
+@REM py ./modules/testEnviroment.py
 
 :loop
 :: Prompt for filename
 set /p filename=Enter python filename:
-if /i "%filename%"=="exit" goto exit
+if /i "%filename%"=="exit" goto leave
 
 :: Run python file
 py %filename%.py
 
 :: Loop back
 goto loop
-:exit
+:leave
 :: Keep window open
 cmd

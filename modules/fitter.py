@@ -22,7 +22,10 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     elif parameters['method'] == Experiment.RIGID_PENDULUM:
         rod_length = parameters['ruler_length']
-        rod_length_error = parameters['ruler_length_error']  # Fixed key name
+        rod_length_error = parameters['ruler_length_error']
+
+        rod_offset = parameters['rod_offset']
+        rod_offset_error = parameters['rod_offset_error']
 
         rod_mass = parameters['ruler_mass']
         rod_mass_error = parameters['ruler_mass_error']
@@ -34,6 +37,9 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
         ball_diameter_error = parameters['ball_diameter_error']
 
         ball_offset = np.sqrt((rod_length - ball_diameter / 2) ** 2 + (ball_diameter / 2) ** 2)
+
+        intertia_moment = ball_mass * ball_offset ** 2 + 1 / 12 * rod_mass * (rod_length + rod_offset) ** 2 - 1 / 12 * rod_mass * rod_offset ** 2
+
 
     initial_guess = [1, 0.1, np.sqrt(9.81 / vertical_length), phase_guess] # A0, gamma, omega, phi
 

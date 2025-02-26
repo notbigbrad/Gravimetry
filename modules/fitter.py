@@ -1,16 +1,51 @@
 import scipy.optimize
-from modules.model import *
+from modules.error_propagation import *
 from modules.plotter import *
+from modules.proccessing import Experiment
 
-def fitting_dataset(filename, l, l_error, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,
-                    camera_rate=60, video_rate=60, focal_length=(24 * 1920) / 8, model=physicalPendulum, do_plot=False):
+def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,
+                    camera_rate=60, video_rate=60, focal_length=(24 * 1920) / 8, do_plot=False):
 
-    #----------- FITTING PARAMETERS -----------
+    #----------- FITTING PARAMETERS FROM METHODOLOGY -----------
+
     bounds = [[0.99,0.0001,0.1,-np.pi],[1.01,100,10,np.pi]]
-    initial_guess = [1, 0.1, np.sqrt(9.81 / l), phase_guess]  # A0, gamma, omega, phi
+
+    if parameters[f'{filename}_method'] == Experiment.DOUBLE_STRING:
+
+        hypotenuse = parameters[f'{filename}_hypotenuse']
+        hypotenuse_error = parameters[f'{filename}_hypotenuse_error']
+
+        horizontal = parameters[f'{filename}_horizontal'] / 2
+        horizontal_error = parameters[f'{filename}_horizontal_error']
+
+        vertical_length = np.sqrt(hypotenuse ** 2 - (horizontal) ** 2)
+        vertical_error = sqrt(vertical_length, hypotenuse, horizontal, hypotenuse_error, horizontal_error, 0, '+')
+
+
+
+    elif parameters[f'{filename}_method'] == Experiment.RIGID_PENDULUM:
+
+        rod_length = parameters[f'{filename}_ruler_length']
+        rod_length_error = parameters[f'{filename}_ruler_error']
+
+        rod_mass = parameters[f'{filename}_ruler_mass']
+        rod_mass_error = parameters[f'{filename}_ruler_mass_error']
+
+        ball_mass = parameters[f'{filename}_ball_mass']
+        ball_mass_error = parameters[f'{filename}_ball_mass_error']
+
+        ball_diameter = parameters[f'{filename}_ball_diameter']
+        ball_diameter_error = parameters[f'{filename}_ball_diameter_error']
+
+        ball_offset = np.sqrt( (rod_length -ball_diameter/2)**2 + (ball_diameter/2)**2  )
+
+
+
+    initial_guess = [1, 0.1, np.sqrt(9.81 / vertical_length), phase_guess] # A0, gamma, omega, phi
+
 
     #----------- PRE-PROCESSING  -----------
-    time, x, _ = np.loadtxt(f'./data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T
+    time, x, _ = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T
     time = time[cut::]*(camera_rate / video_rate)
     x = x[cut::]                                 #-- get the data and trim it
 
@@ -31,7 +66,7 @@ def fitting_dataset(filename, l, l_error, tracking_error=0.05, phase_guess=np.pi
 
     #----------- PLOTTING (OPTIONAL) -----------
     if do_plot:
-        do_plot_go(filename, time, x, tracking_error, optimal, l, r, model)
+        do_plot_go(filename, time, x, tracking_error, optimal, vertical_length, r, model)
 
     # ----------- PARAMETER EXTRACTION FOR G -----------
 
@@ -43,8 +78,8 @@ def fitting_dataset(filename, l, l_error, tracking_error=0.05, phase_guess=np.pi
                              + covariance[1, 1] * (gamma / omega_naught) ** 2
                              + 2 * (gamma * omega / omega_naught ** 2) * covariance[1, 2])  # ω naught variance and value
 
-    g = (omega_naught ** 2) * l
-    g_variance = g ** 2 * ((omega_naught_variance / omega_naught) ** 2 + (l_error / l) ** 2)
+    g = (omega_naught ** 2) * vertical_length
+    g_variance = g ** 2 * ((omega_naught_variance / omega_naught) ** 2 + (vertical_error / vertical_length) ** 2)
     g_standard_deviation = np.sqrt(g_variance)
 
     print(f'g: {g} +- {g_standard_deviation} ms^-2')

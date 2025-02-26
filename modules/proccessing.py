@@ -29,108 +29,71 @@ class Experiment(Enum):
 # SET 5 is Wooden ruler
 
 params_dict = {
-
-    'set1_hypotenuse': 0.201,
-    'set1_hypotenuse_error': 0.5E-3,
-
-    'set1_horizontal': 0.485,
-    'set1_horizontal_error': 0.5E-3,
-
-    'set1_ball_diameter': 30E-3,
-    'set1_ball_diameter_error': 0.03E-3,
-
-    'set1_method' : Experiment.DOUBLE_STRING,
-
-
-
-
-    'set2_hypotenuse': 0.201,
-    'set2_hypotenuse_error': 0.5E-3,
-
-    'set2_horizontal': 0.485,
-    'set2_horizontal_error': 0.5E-3,
-
-    'set2_ball_diameter': 30E-3,
-    'set2_ball_diameter_error': 0.03E-3,
-
-    'set2_method' : Experiment.DOUBLE_STRING,
-
-
-
-
-    'set3_ruler_length': 1,
-    'set3_ruler_length_error': 0.5E-3,
-
-    'set3_distance_to_pivot': 4E-3,
-    'set3_distance_to_pivot_error': 0.02E-2,
-
-    'set3_ruler_thickness': 1.8E-3,
-    'set3_ruler_thickness_error': 0.02E-2,
-
-    'set3_ruler_mass' : 142.8E-3,
-    'set3_ruler_mass_error': 0.2E-3,
-
-    'set3_ball_diameter': 30E-3,
-    'set3_ball_diameter_error': 0.03E-3,
-
-    'set3_ball_mass': 109.0E-3,
-    'set3_ball_mass_error': 0.2E-3,
-
-    'set3_method' : Experiment.RIGID_PENDULUM,
-
-
-
-    'set4_ruler_length': 1,
-    'set4_ruler_length_error': 0.5E-3,
-
-    'set4_distance_to_pivot': 4E-3,
-    'set4_distance_to_pivot_error': 0.02E-2,
-
-    'set4_ruler_thickness': 1.8E-3,
-    'set4_ruler_thickness_error': 0.02E-2,
-
-    'set4_ruler_mass' : 142.8E-3,
-    'set4_ruler_mass_error': 0.2E-3,
-
-    'set4_ball_diameter': 30E-3,
-    'set4_ball_diameter_error': 0.03E-3,
-
-    'set4_ball_mass': 109.0E-3,
-    'set4_ball_mass_error': 0.2E-3,
-
-    'set4_method' : Experiment.RIGID_PENDULUM,
-
-
-
-    'set5_ruler_length': 1,
-    'set5_ruler_length_error': 4E-3,
-
-    'set5_distance_to_pivot': 9.5E-3,
-    'set5_distance_to_pivot_error': 0.02E-2,
-
-    'set5_ruler_thickness': 5.4E-3,
-    'set5_ruler_thickness_error': 0.02E-2,
-
-    'set5_ruler_mass' : 111.6E-3,
-    'set5_ruler_mass_error': 0.2E-3,
-
-    'set5_ball_diameter': 30E-3,
-    'set5_ball_diameter_error': 0.03E-3,
-
-    'set5_ball_mass': 109.0E-3,
-    'set5_ball_mass_error': 0.2E-3,
-
-    'set5_method' : Experiment.RIGID_PENDULUM,
-
-
-
-
-
-
-    #...
-
-
+    'set1': {
+        'hypotenuse': 0.201,
+        'hypotenuse_error': 0.5E-3,
+        'horizontal': 0.485,
+        'horizontal_error': 0.5E-3,
+        'ball_diameter': 30E-3,
+        'ball_diameter_error': 0.03E-3,
+        'method': Experiment.DOUBLE_STRING,
+    },
+    'set2': {
+        'hypotenuse': 0.201,
+        'hypotenuse_error': 0.5E-3,
+        'horizontal': 0.485,
+        'horizontal_error': 0.5E-3,
+        'ball_diameter': 30E-3,
+        'ball_diameter_error': 0.03E-3,
+        'method': Experiment.DOUBLE_STRING,
+    },
+    'set3': {
+        'ruler_length': 1,
+        'ruler_length_error': 0.5E-3,
+        'distance_to_pivot': 4E-3,
+        'distance_to_pivot_error': 0.02E-2,
+        'ruler_thickness': 1.8E-3,
+        'ruler_thickness_error': 0.02E-2,
+        'ruler_mass': 142.8E-3,
+        'ruler_mass_error': 0.2E-3,
+        'ball_diameter': 30E-3,
+        'ball_diameter_error': 0.03E-3,
+        'ball_mass': 109.0E-3,
+        'ball_mass_error': 0.2E-3,
+        'method': Experiment.RIGID_PENDULUM,
+    },
+    'set4': {
+        'ruler_length': 1,
+        'ruler_length_error': 0.5E-3,
+        'distance_to_pivot': 4E-3,
+        'distance_to_pivot_error': 0.02E-2,
+        'ruler_thickness': 1.8E-3,
+        'ruler_thickness_error': 0.02E-2,
+        'ruler_mass': 142.8E-3,
+        'ruler_mass_error': 0.2E-3,
+        'ball_diameter': 30E-3,
+        'ball_diameter_error': 0.03E-3,
+        'ball_mass': 109.0E-3,
+        'ball_mass_error': 0.2E-3,
+        'method': Experiment.RIGID_PENDULUM,
+    },
+    'set5': {
+        'ruler_length': 1,
+        'ruler_length_error': 4E-3,
+        'distance_to_pivot': 9.5E-3,
+        'distance_to_pivot_error': 0.02E-2,
+        'ruler_thickness': 5.4E-3,
+        'ruler_thickness_error': 0.02E-2,
+        'ruler_mass': 111.6E-3,
+        'ruler_mass_error': 0.2E-3,
+        'ball_diameter': 30E-3,
+        'ball_diameter_error': 0.03E-3,
+        'ball_mass': 109.0E-3,
+        'ball_mass_error': 0.2E-3,
+        'method': Experiment.RIGID_PENDULUM,
+    }
 }
+
 
 # ---- DATASETS ----
 # if OLD_DATA_TEST:
@@ -157,7 +120,7 @@ params_dict = {
 for filename in fileNames:
     if re.match(REGEX_PATTERN, filename):
         filename = filename.replace('.csv', '')
-        g.append(fitting_dataset(filename, params_dict,
+        g.append(fitting_dataset(filename, params_dict[f'{filename}'],
                                  0.05, np.pi / 2,
                                  0,
                                  do_plot=DO_PLOT))

@@ -8,38 +8,32 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     #----------- FITTING PARAMETERS FROM METHODOLOGY -----------
 
-    bounds = [[0.99,0.0001,0.1,-np.pi],[1.01,100,10,np.pi]]
+    bounds = [[0.99, 0.0001, 0.1, -np.pi], [1.01, 100, 10, np.pi]]
 
-    if parameters[f'{filename}_method'] == Experiment.DOUBLE_STRING:
+    if parameters['method'] == Experiment.DOUBLE_STRING:
+        hypotenuse = parameters['hypotenuse']
+        hypotenuse_error = parameters['hypotenuse_error']
 
-        hypotenuse = parameters[f'{filename}_hypotenuse']
-        hypotenuse_error = parameters[f'{filename}_hypotenuse_error']
+        horizontal = parameters['horizontal'] / 2
+        horizontal_error = parameters['horizontal_error']
 
-        horizontal = parameters[f'{filename}_horizontal'] / 2
-        horizontal_error = parameters[f'{filename}_horizontal_error']
-
-        vertical_length = np.sqrt(hypotenuse ** 2 - (horizontal) ** 2)
+        vertical_length = np.sqrt(hypotenuse ** 2 - horizontal ** 2)
         vertical_error = sqrt(vertical_length, hypotenuse, horizontal, hypotenuse_error, horizontal_error, 0, '+')
 
+    elif parameters['method'] == Experiment.RIGID_PENDULUM:
+        rod_length = parameters['ruler_length']
+        rod_length_error = parameters['ruler_length_error']  # Fixed key name
 
+        rod_mass = parameters['ruler_mass']
+        rod_mass_error = parameters['ruler_mass_error']
 
-    elif parameters[f'{filename}_method'] == Experiment.RIGID_PENDULUM:
+        ball_mass = parameters['ball_mass']
+        ball_mass_error = parameters['ball_mass_error']
 
-        rod_length = parameters[f'{filename}_ruler_length']
-        rod_length_error = parameters[f'{filename}_ruler_error']
+        ball_diameter = parameters['ball_diameter']
+        ball_diameter_error = parameters['ball_diameter_error']
 
-        rod_mass = parameters[f'{filename}_ruler_mass']
-        rod_mass_error = parameters[f'{filename}_ruler_mass_error']
-
-        ball_mass = parameters[f'{filename}_ball_mass']
-        ball_mass_error = parameters[f'{filename}_ball_mass_error']
-
-        ball_diameter = parameters[f'{filename}_ball_diameter']
-        ball_diameter_error = parameters[f'{filename}_ball_diameter_error']
-
-        ball_offset = np.sqrt( (rod_length -ball_diameter/2)**2 + (ball_diameter/2)**2  )
-
-
+        ball_offset = np.sqrt((rod_length - ball_diameter / 2) ** 2 + (ball_diameter / 2) ** 2)
 
     initial_guess = [1, 0.1, np.sqrt(9.81 / vertical_length), phase_guess] # A0, gamma, omega, phi
 

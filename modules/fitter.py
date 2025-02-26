@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.optimize
-from modules.error_propagation import independent_errors
+from modules.error_propagation import independent_variance
 from modules.plotter import *
 from enum import Enum
 
@@ -13,14 +13,18 @@ class Experiment(Enum):
 def double_string_pendulum(p):
 
     effective_length = np.sqrt( (p['hypotenuse'])**2 - (p['horizontal']/2)**2  )
+    effective_length_variance = independent_variance(my_function= lambda H, d: H ** 2 - (d / 2) ** 2,
+                                                     quantity = effective_length,
+                                                     hypotenuse = [p['hypotenuse'], p['hypotenuse_error']],
+                                                     horizontal = [p['horizontal'], p['horizontal_error']])
 
-    effective_length_error = independent_errors(my_function= lambda H, d: H ** 2 - (d / 2) ** 2,
-                                                quantity = effective_length,
-                                                hypotenuse = [p['hypotenuse'], p['hypotenuse_error']],
-                                                horizontal = [p['horizontal'], p['horizontal_error']], )
+    effective_length_standard_deviation = np.sqrt(effective_length_variance)
 
-
-
+    effective_length_with_ball = effective_length + p['ball_diameter']/2
+    effective_length_with_ball_variance = independent_variance(my_function= lambda L, d: L + d/2,
+                                                               quantity = effective_length_with_ball,
+                                                               effective_length = [effective_length, effective_length_standard_deviation],
+                                                               ball_diameter = [p['ball_diameter'], p['ball_diameter_error']])
 
 def compound_pendulum(parameters):
     pass

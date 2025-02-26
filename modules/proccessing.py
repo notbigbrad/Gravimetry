@@ -2,8 +2,8 @@ import os
 import re
 import scipy
 import numpy as np
-from enum import Enum
-from modules.fitter import fitting_dataset, fitting_g
+from modules.fitter import fitting_dataset, fitting_g, Experiment
+
 
 # ------ SETUP ---------
 fileNames = os.listdir('../data/')
@@ -13,10 +13,6 @@ g = []
 
 OLD_DATA_TEST = False
 DO_PLOT = True
-
-class Experiment(Enum):
-    DOUBLE_STRING = 0
-    RIGID_PENDULUM = 1
 
 
 # ---PARAMETER CONFIG---
@@ -60,7 +56,7 @@ params_dict = {
         'ball_diameter_error': 0.03E-3,
         'ball_mass': 109.0E-3,
         'ball_mass_error': 0.2E-3,
-        'method': Experiment.RIGID_PENDULUM,
+        'method': Experiment.COMPOUND_PENDULUM,
     },
     'set4': {
         'ruler_length': 1,
@@ -75,7 +71,7 @@ params_dict = {
         'ball_diameter_error': 0.03E-3,
         'ball_mass': 109.0E-3,
         'ball_mass_error': 0.2E-3,
-        'method': Experiment.RIGID_PENDULUM,
+        'method': Experiment.COMPOUND_PENDULUM,
     },
     'set5': {
         'ruler_length': 1,
@@ -90,32 +86,12 @@ params_dict = {
         'ball_diameter_error': 0.03E-3,
         'ball_mass': 109.0E-3,
         'ball_mass_error': 0.2E-3,
-        'method': Experiment.RIGID_PENDULUM,
+        'method': Experiment.COMPOUND_PENDULUM,
     }
 }
 
 
 # ---- DATASETS ----
-# if OLD_DATA_TEST:
-#
-#     # Set known data
-#     l = 0.735  # compensation for ball diameter of ~40mm
-#     s = 0.248 / 2
-#     old_vertical = np.sqrt(l ** 2 - s ** 2)
-#     old_vertical_accuracy = 0.01
-#
-#     # Initialise arrays
-#
-#     g.append(fitting_dataset("bradDat1", old_vertical, old_vertical_accuracy, 0.05, np.pi / 2 + 0.4, 500, 29.97, 240, do_plot=DO_PLOT))
-#     g.append(fitting_dataset("bradDat2", old_vertical, old_vertical_accuracy, 0.05, np.pi / 2 + 0.4, 500, 29.97, 240, do_plot=DO_PLOT))
-#     g.append(fitting_dataset("matDat1", old_vertical, old_vertical_accuracy, 0.05, np.pi / 2, do_plot=DO_PLOT))
-#     g.append(fitting_dataset("nicoleDat1", old_vertical, old_vertical_accuracy, 0.05, np.pi / 2 - 1.8, 0, do_plot=DO_PLOT))
-#
-#     # Set known data
-#     old_vertical = 0.737
-#     old_vertical_accuracy = 0.005
-#
-#     g.append(fitting_dataset("hopeDat1", old_vertical, old_vertical_accuracy, 0.05, np.pi / 2, 0, do_plot=DO_PLOT))
 
 for filename in fileNames:
     if re.match(REGEX_PATTERN, filename):
@@ -124,7 +100,6 @@ for filename in fileNames:
                                  0.05, np.pi / 2,
                                  0,
                                  do_plot=DO_PLOT))
-
 
 # ---- FINAL FIT ----
 fitting_g(g)

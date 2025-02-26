@@ -1,18 +1,20 @@
 import numpy as np
+import sympy as sp
 
-# ALL INPUTS TAKEN ARE STANDARD DEVIATIONS
+def independent_errors(my_function, quantity, **kwargs):
 
-def sqrt(f,A,B,stdA,stdB,stdAB,sgn):
-    if(sgn == "+"):
-        return np.sqrt((A/f)**2 * stdA**2 + (B/f)**2 * stdB**2 + 2 * (A*B)/(f**2)*stdAB)
-    if(sgn == "-"):
-        return np.sqrt((A/f)**2 * stdA**2 + (B/f)**2 * stdB**2 - 2 * (A*B)/(f**2)*stdAB)
-    
-def div(f,A,B,stdA,stdB,stdAB):
-    return f*np.sqrt((stdA/A)**2 + (stdB/B)**2 - 2*(stdAB)/(A*B))
+    summation = 0
 
-def mul(f,A,B,stdA,stdB,stdAB):
-    return f*np.sqrt((stdA/A)**2 + (stdB/B)**2 + 2*(stdAB)/(A*B))
+    variable_names = my_function.__code__.co_varnames
+    variables = sp.symbols(variable_names)
+    my_function_expression = my_function(*variables)
 
-def add(a,b,stdA,stdB,stdAB):
-    return np.sqrt(a**2*stdA**2 + b**2*stdB**2 - 2*a*b*stdAB)
+    for i, (variable_name, (value, parameter_error)) in enumerate(kwargs.items()):
+        partial_derivative = sp.diff(my_function_expression, variables[i])
+
+        input_values = [val[0] for val in kwargs.values()]
+        evaluated_partial_derivative = partial_derivative.subs((dict(zip(variable_names, input_values))))
+
+        summation += (evaluated_partial_derivative * parameter_error)**2
+
+    return np.sqrt(summation)

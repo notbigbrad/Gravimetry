@@ -1,4 +1,4 @@
-from modules.modelling import physicalPendulum as physical_pendulum, sin, f
+from modules.modelling import under_damped_pendulum as physical_pendulum, sin, linear_function
 import numpy as np
 import matplotlib.pyplot as plt
 

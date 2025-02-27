@@ -2,19 +2,14 @@ import os
 import re
 import numpy as np
 from modules.fitter import fitting_dataset, fitting_g
-from modules.Enums import Experiment, Dependence
+from modules.Enums import Experiment
 
 
 # ------ SETUP ---------
 fileNames = os.listdir('../data/')
 REGEX_PATTERN = r"^set\d+\.csv$"
-
 g = []
-
-DO_PLOT = True
-
-
-
+DO_PLOT = False
 # ---PARAMETER CONFIG---
 
 # sets 1,2 performed on 23/02/25
@@ -69,6 +64,9 @@ params_dict = {
 
 
 # ---- DATASETS ----
+
+g.append(fitting_dataset('set5',params_dict['set5'],0.05, np.pi / 2,0,do_plot=DO_PLOT))
+
 
 for filename in fileNames:
     if re.match(REGEX_PATTERN, filename):

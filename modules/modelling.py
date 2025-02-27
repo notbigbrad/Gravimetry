@@ -3,7 +3,7 @@
 
 import numpy as np
 
-def physicalPendulum(t, A0, gamma, o, phi):
+def under_damped_pendulum(t, A0, gamma, o, phi):
     exponent = -(t*gamma)
     a = (o*t - phi)
     return (A0*np.exp(exponent)*np.cos(a))
@@ -11,5 +11,5 @@ def physicalPendulum(t, A0, gamma, o, phi):
 def sin(t,o,p):
     return np.sin(p + o*t)
 
-def f(t, c):
+def linear_function(t, c):
     return c + t * 0

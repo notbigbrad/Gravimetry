@@ -13,7 +13,7 @@ class Experiment(Enum):
 def double_string_pendulum(p):
 
     effective_length = np.sqrt( (p['hypotenuse'])**2 - (p['horizontal']/2)**2  )
-    effective_length_variance = independent_variance(my_function= lambda H, d: H ** 2 - (d / 2) ** 2,
+    effective_length_variance = independent_variance(my_function= lambda H, d: ( H ** 2 - (d / 2) ** 2 ) ** (1/2),
                                                      quantity = effective_length,
                                                      hypotenuse = [p['hypotenuse'], p['hypotenuse_error']],
                                                      horizontal = [p['horizontal'], p['horizontal_error']])
@@ -26,8 +26,13 @@ def double_string_pendulum(p):
                                                                effective_length = [effective_length, effective_length_standard_deviation],
                                                                ball_diameter = [p['ball_diameter'], p['ball_diameter_error']])
 
-def compound_pendulum(parameters):
-    pass
+    effective_length_with_ball_standard_deviation = np.sqrt(effective_length_with_ball_variance)
+    print('bruh')
+def compound_pendulum(p):
+
+    ball_offset = np.sqrt(  (p['rod_length'] - p['ball_diameter']/2)**2  + (p['ball_diameter']/2)**2  )
+
+    rod_linear_density = p['rod_mass'] / p['rod_length']
 
 
 def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,

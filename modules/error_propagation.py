@@ -17,4 +17,4 @@ def independent_variance(my_function, quantity, **kwargs):
 
         result += (evaluated_partial_derivative * parameter_error)**2
 
-    return result
+    return np.float64(result)

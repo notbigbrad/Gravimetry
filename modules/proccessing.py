@@ -65,9 +65,6 @@ params_dict = {
 
 # ---- DATASETS ----
 
-g.append(fitting_dataset('set5',params_dict['set5'],0.05, np.pi / 2,0,do_plot=DO_PLOT))
-
-
 for filename in fileNames:
     if re.match(REGEX_PATTERN, filename):
         filename = filename.replace('.csv', '')

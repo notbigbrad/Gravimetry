@@ -1,7 +1,8 @@
 import os
 import re
 import numpy as np
-from modules.fitter import fitting_dataset, fitting_g, Experiment
+from modules.fitter import fitting_dataset, fitting_g
+from modules.Enums import Experiment, Dependence
 
 
 # ------ SETUP ---------
@@ -11,6 +12,7 @@ REGEX_PATTERN = r"^set\d+\.csv$"
 g = []
 
 DO_PLOT = True
+
 
 
 # ---PARAMETER CONFIG---

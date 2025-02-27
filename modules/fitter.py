@@ -1,30 +1,31 @@
 import numpy as np
 import scipy.optimize
-from modules.error_propagation import independent_variance
-from modules.plotter import *
-from enum import Enum
+from modules.error_propagation import variance_propagation
+from modules.Enums import Experiment, Dependence
+from modules.plotter import plot_now, do_plot_go
 
-class Experiment(Enum):
-    DOUBLE_STRING = 0
-    COMPOUND_PENDULUM = 1
 
 
 
 def double_string_pendulum(p):
 
     effective_length = np.sqrt(  (p['hypotenuse'][0])**2 - (p['horizontal'][0]/2)**2  )
-    effective_length_variance = independent_variance(my_function= lambda H, d: ( H ** 2 - (d / 2) ** 2 ) ** (1/2),
-                                                     hypotenuse = p['hypotenuse'],
-                                                     horizontal = p['horizontal'])
+    effective_length_variance = variance_propagation(my_function= lambda H, d: (H ** 2 - (d / 2) ** 2) ** (1 / 2),
+                                                     hypotenuse = [p['hypotenuse'], Dependence.INDEPENDENT],
+                                                     horizontal = [p['horizontal'], Dependence.INDEPENDENT],
+                                                     covariance_matrix = [])
 
     effective_length_standard_deviation = np.sqrt(effective_length_variance)
 
     effective_length_with_ball = effective_length + p['ball_diameter'][0]/2
-    effective_length_with_ball_variance = independent_variance(my_function= lambda L, d: L + d/2,
-                                                               effective_length = [effective_length, effective_length_standard_deviation],
-                                                               ball_diameter = p['ball_diameter'])
+    effective_length_with_ball_variance = variance_propagation(my_function= lambda L, d: L + d / 2,
+                                                               effective_length = [[effective_length, effective_length_standard_deviation], Dependence.INDEPENDENT],
+                                                               ball_diameter = [p['ball_diameter'], Dependence.INDEPENDENT])
 
     effective_length_with_ball_standard_deviation = np.sqrt(effective_length_with_ball_variance)
+
+
+
 def compound_pendulum(p):
 
     ball_offset = np.sqrt(  (p['rod_length'] - p['ball_diameter']/2)**2  + (p['ball_diameter']/2)**2  )
@@ -48,10 +49,10 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     #----------- METHODOLOGY PROCESSING -----------
 
-    if parameters['method'] is Experiment.DOUBLE_STRING:
-        return double_string_pendulum(parameters)
+    if parameters['method'] == Experiment.DOUBLE_STRING:
+        double_string_pendulum(parameters)
 
-    elif parameters['method'] is Experiment.COMPOUND_PENDULUM:
+    elif parameters['method'] == Experiment.COMPOUND_PENDULUM:
         return compound_pendulum(parameters)
 
 
@@ -93,9 +94,6 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
 
     return [g, g_standard_deviation]
-
-
-
 
 
 

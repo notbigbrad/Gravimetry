@@ -37,8 +37,8 @@ params_dict = {
         'distance_to_pivot': (4E-3, 0.02E-2),
         'rod_thickness': (1.8E-3, 0.02E-2),
         'rod_mass': (142.8E-3, 0.2E-3),
-        'ball_diameter': (30E-3, 0.03E-3),
-        'ball_mass': (109.0E-3, 0.2E-3),
+        'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
+        'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
     },
     'set4': {
@@ -46,8 +46,8 @@ params_dict = {
         'distance_to_pivot': (4E-3, 0.02E-2),
         'rod_thickness': (1.8E-3, 0.02E-2),
         'rod_mass': (142.8E-3, 0.2E-3),
-        'ball_diameter': (30E-3, 0.03E-3),
-        'ball_mass': (109.0E-3, 0.2E-3),
+        'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
+        'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
     },
     'set5': {

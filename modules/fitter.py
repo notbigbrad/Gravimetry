@@ -11,14 +11,16 @@ from modules.plotter import plot_now, do_plot_go
 def double_string_pendulum(p):
 
     effective_length = np.sqrt(  (p['hypotenuse'][0])**2 - (p['horizontal'][0]/2)**2  )
-    effective_length_variance = variance_propagation(my_function= lambda h, d: (h ** 2 - (d / 2) ** 2) ** (1 / 2),
+    effective_length_variance = variance_propagation(my_function= lambda h, d:
+                                                       (h ** 2 - (d / 2) ** 2) ** (1 / 2),
                                                      hypotenuse= [p['hypotenuse'], Dependence.INDEPENDENT],
-                                                     horizontal= [p['horizontal'], Dependence.INDEPENDENT],)
+                                                     horizontal= [p['horizontal'], Dependence.INDEPENDENT])
 
     effective_length_standard_deviation = np.sqrt(effective_length_variance)
 
     effective_length_with_ball = effective_length + p['ball_diameter'][0]/2
-    effective_length_with_ball_variance = variance_propagation(my_function= lambda l, d: l + d / 2,
+    effective_length_with_ball_variance = variance_propagation(my_function= lambda l, d:
+                                                                 l + d / 2,
                                                                effective_length= [(effective_length, effective_length_standard_deviation), Dependence.INDEPENDENT],
                                                                ball_diameter= [p['ball_diameter'], Dependence.INDEPENDENT])
 
@@ -28,15 +30,18 @@ def double_string_pendulum(p):
 
 def compound_pendulum(p):
 
-    ball_offset = np.sqrt(  (p['rod_length'][0] - p['ball_diameter'][0]/2)**2  + (p['ball_diameter'][0]/2)**2  )
-    ball_offset_variance = variance_propagation(my_function= lambda l, d: ((l - d/2) ** 2 + (d/2) ** 2) ** (1/2),
+    ball_offset = np.sqrt(  (p['rod_length'][0] - p['distance_to_pivot'])**2  + (p['ball_diameter'][0]/2)**2  )
+    ball_offset_variance = variance_propagation(my_function= lambda l, Δp, d:
+                                                  ((l + Δp) ** 2 + (d/2) ** 2) ** (1/2),
                                                 rod_length= [p['rod_length'], Dependence.INDEPENDENT],
+                                                distance_to_pivot= [p['distance_to_pivot'], Dependence.INDEPENDENT],
                                                 ball_diameter= [p['ball_diameter'], Dependence.INDEPENDENT])
 
     ball_offset_standard_deviation = np.sqrt(ball_offset_variance)
 
     rod_linear_density = p['rod_mass'][0] / p['rod_length'][0]
-    rod_linear_density_variance = variance_propagation(my_function= lambda m, l : m/l,
+    rod_linear_density_variance = variance_propagation(my_function= lambda m, l :
+                                                        m/l,
                                                        rod_mass= [p['rod_mass'], Dependence.INDEPENDENT],
                                                        rod_length= [p['rod_length'], Dependence.INDEPENDENT])
 
@@ -61,10 +66,26 @@ def compound_pendulum(p):
 
     moment_of_inertia_standard_deviation = np.sqrt(moment_of_inertia_variance)
 
+    radius_centre_of_mass = 0
+
+
+    radius_centre_of_mass = ((  (p['rod_length'][0]/2 * p['rod_mass'][0]) + (ball_offset * p['ball_mass'][0])  )
+                             / (p['rod_mass'][0] + p['ball_mass'][0]))
+
+    radius_centre_of_mass_variance = variance_propagation(my_function= lambda l_r, m_r, r_b, m_b :
+                                                            ((l_r/2 * m_r) + (r_b * m_b))
+                                                            / (m_r + m_b),
+                                                          rod_length= [p['rod_length'], Dependence.INDEPENDENT],
+                                                          rod_mass= [p['rod_mass'], Dependence.INDEPENDENT],
+                                                          ball_offset= [(ball_offset, ball_offset_standard_deviation), Dependence.INDEPENDENT],
+                                                          ball_mass= [p['ball_mass'], Dependence.INDEPENDENT])
+
+    radius_centre_of_mass_standard_deviation = np.sqrt(radius_centre_of_mass_variance)
 
 
 
 
+    return radius_centre_of_mass, radius_centre_of_mass_standard_deviation
 
 def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,
                     camera_rate=60, video_rate=60, focal_length=(24 * 1920) / 8, do_plot=False):

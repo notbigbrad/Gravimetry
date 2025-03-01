@@ -25,12 +25,18 @@ params_dict = {
         'horizontal': (0.485, 0.5E-3),
         'ball_diameter': (30E-3, 0.03E-3),
         'method': Experiment.DOUBLE_STRING,
+
+        'video_rate' : 60,
+        'camera_rate' : 60
     },
     'set2': {
         'hypotenuse': (2.010, 0.5E-3),
         'horizontal': (0.485, 0.5E-3),
         'ball_diameter': (30E-3, 0.03E-3),
         'method': Experiment.DOUBLE_STRING,
+
+        'video_rate' : 60,
+        'camera_rate' : 60
     },
     'set3': {
         'rod_length': (1, 0.5E-3),
@@ -40,6 +46,9 @@ params_dict = {
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
+
+        'video_rate': 240,
+        'camera_rate': 29.97
     },
     'set4': {
         'rod_length': (1, 0.5E-3),
@@ -49,6 +58,9 @@ params_dict = {
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
+
+        'video_rate': 60,
+        'camera_rate': 60
     },
     'set5': {
         'rod_length': (1, 4E-3),
@@ -58,6 +70,9 @@ params_dict = {
         'ball_diameter': (30E-3, 0.03E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.COMPOUND_PENDULUM,
+
+        'video_rate': 240,
+        'camera_rate': 29.97
     }
 }
 
@@ -68,12 +83,7 @@ params_dict = {
 for filename in fileNames:
     if re.match(REGEX_PATTERN, filename):
         filename = filename.replace('.csv', '')
-        g.append(fitting_dataset(filename,
-                                 params_dict[f'{filename}'],
-                                 0.05,
-                                 np.pi / 2,
-                                 0,
-                                 do_plot=DO_PLOT))
+        g.append(fitting_dataset(filename, params_dict[f'{filename}'], 0.05, np.pi / 2,0, do_plot=DO_PLOT))
 
 # ---- FINAL FIT ----
 fitting_g(g)

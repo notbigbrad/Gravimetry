@@ -74,22 +74,23 @@ def compound_pendulum(p):
 
 
     moment_of_inertia = (
-            (p['ball_mass'][0] * ball_radius ** 2) + (
-                1 / 3 * (rod_linear_density * (p['rod_length'][0] + p['distance_to_pivot'][0])) * (
-                    p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2)
+            (2/5 * p['ball_mass'][0] * ball_radius ** 2)
+            + (p['ball_mass'][0] * (p['rod_length'][0] + ball_radius) ** 2)
+            + (1 / 3 * (rod_linear_density * (p['rod_length'][0] + p['distance_to_pivot'][0])) * (p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2)
             - (1 / 3 * (rod_linear_density * p['distance_to_pivot'][0]) * p['distance_to_pivot'][0] ** 2)
     )
 
-    m_b, r_b, λ, l_r, Δp  = sp.symbols('m_b r_b λ l_r Δp')
-    expr_moment_of_inertia = ((m_b * r_b ** 2) + (1 / 3 * λ * (l_r + Δp) * (l_r + Δp) ** 2)
-                              - (1 / 3 * λ * Δp * Δp ** 2))
+    m_b, r_b, l_r, λ, Δp  = sp.symbols('m_b r_b l_r λ Δp')
+    expr_moment_of_inertia = (  (2 / 5 * m_b * r_b ** 2) + (m_b * (l_r + r_b) ** 2)
+                                +(1 / 3 * λ * (l_r + Δp) * (l_r + Δp) ** 2)
+                                - (1 / 3 * λ * Δp * Δp ** 2))
 
     moment_of_inertia_variance = variance_propagation(
         my_function=expr_moment_of_inertia,
         ball_mass=[p['ball_mass'], Dependence.INDEPENDENT, m_b],
         ball_radius=[(ball_radius, ball_radius_standard_deviation), Dependence.INDEPENDENT, r_b],
-        rod_linear_density=[(rod_linear_density, rod_linear_density_standard_deviation), Dependence.INDEPENDENT, λ],
         rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
+        rod_linear_density=[(rod_linear_density, rod_linear_density_standard_deviation), Dependence.INDEPENDENT, λ],
         distance_to_pivot=[p['distance_to_pivot'], Dependence.INDEPENDENT, Δp]
     )
 

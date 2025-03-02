@@ -44,7 +44,7 @@ def double_string_pendulum(p):
 
 def compound_pendulum(p):
 
-    ball_radius = np.sqrt((p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2 + ((p['ball_diameter'][0] + p['rod_thickness']) / 2) ** 2)
+    ball_radius = np.sqrt((p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2 + ((p['ball_diameter'][0] + p['rod_thickness'][0]) / 2) ** 2)
 
     l_r, Δp, d_b, t_r = sp.symbols('l_r Δp d_b t_r')
     expr_ball_offset = sp.sqrt((l_r + Δp) ** 2 + ((d_b + t_r)/ 2) ** 2)
@@ -75,14 +75,13 @@ def compound_pendulum(p):
 
 
     moment_of_inertia = (
-            (2/5 * p['ball_mass'][0] * ball_radius ** 2)
-            + (p['ball_mass'][0] * (p['rod_length'][0] + ball_radius) ** 2)
+            (p['ball_mass'][0] * ball_radius ** 2)
             + (1 / 3 * (rod_linear_density * (p['rod_length'][0] + p['distance_to_pivot'][0])) * (p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2)
             - (1 / 3 * (rod_linear_density * p['distance_to_pivot'][0]) * p['distance_to_pivot'][0] ** 2)
     )
 
     m_b, r_b, l_r, λ, Δp  = sp.symbols('m_b r_b l_r λ Δp')
-    expr_moment_of_inertia = (  (2 / 5 * m_b * r_b ** 2) + (m_b * (l_r + r_b) ** 2)
+    expr_moment_of_inertia = (   (m_b * r_b ** 2)
                                 +(1 / 3 * λ * (l_r + Δp) * (l_r + Δp) ** 2)
                                 - (1 / 3 * λ * Δp * Δp ** 2))
 

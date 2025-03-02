@@ -123,7 +123,7 @@ def compound_pendulum(p):
 
     Δp, l_r, m_b, d_b, t_r, m_r = sp.symbols('Δp l_r m_b d_b t_r m_r')
     expr_radius_centre_of_mass = sp.sqrt(  ((Δp + l_r/2) ** 2)
-                                           + (((m_b) ** 2 * (  (d_b + t_r) ** 2 + (l_r) ** 2)) / (4 * ((m_b + m_r) ** 2)))
+                                           + (  (m_b ** 2 * (   (d_b + t_r) ** 2 + l_r ** 2     )   ) / (4 * (  (m_b + m_r) ** 2)   )   )
                                            + (  ( (m_b * l_r) / (m_b + m_r) ) * (Δp + l_r/2) )
                                         )
 
@@ -143,8 +143,7 @@ def compound_pendulum(p):
     return radius_centre_of_mass, radius_centre_of_mass_standard_deviation, moment_of_inertia, moment_of_inertia_standard_deviation
 
 
-def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,  do_plot=False,
-                    ):
+def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,  do_plot=False):
 
     # ----------- PRE-PROCESSING  -----------
     time, x, _ = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T

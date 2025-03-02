@@ -44,16 +44,17 @@ def double_string_pendulum(p):
 
 def compound_pendulum(p):
 
-    ball_radius = np.sqrt((p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2 + (p['ball_diameter'][0] / 2) ** 2)
+    ball_radius = np.sqrt((p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2 + ((p['ball_diameter'][0] + p['rod_thickness']) / 2) ** 2)
 
-    l, Δp, d = sp.symbols('l Δp d')
-    expr_ball_offset = sp.sqrt((l + Δp) ** 2 + (d / 2) ** 2)
+    l_r, Δp, d_b, t_r = sp.symbols('l_r Δp d_b t_r')
+    expr_ball_offset = sp.sqrt((l_r + Δp) ** 2 + ((d_b + t_r)/ 2) ** 2)
 
     ball_radius_variance = variance_propagation(
         my_function=expr_ball_offset,
-        rod_length=[p['rod_length'], Dependence.INDEPENDENT, l],
+        rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
         distance_to_pivot=[p['distance_to_pivot'], Dependence.INDEPENDENT, Δp],
-        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d]
+        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
+        rod_thickness=[p['rod_thickness'], Dependence.INDEPENDENT, t_r]
     )
 
     ball_radius_standard_deviation = np.sqrt(ball_radius_variance)
@@ -96,31 +97,30 @@ def compound_pendulum(p):
 
     moment_of_inertia_standard_deviation = np.sqrt(moment_of_inertia_variance)
 
-    radius_centre_of_mass = np.sqrt(  (p['distance_to_pivot'][0] + p['rod_length'][0]/2) ** 2
-                                      + ((p['ball_mass'][0] / (p['ball_mass'][0] + p['rod_mass'][0]))
-                                      * np.sqrt(  (p['ball_diameter'][0]/2) ** 2 + (p['rod_length'][0]/2) ** 2 )) ** 2
-                                      - 2 * (p['distance_to_pivot'][0] + p['rod_length'][0]/2)
-                                      * ((p['ball_mass'][0] / (p['ball_mass'][0] + p['rod_mass'][0]))
-                                      * np.sqrt(  (p['ball_diameter'][0]/2) ** 2 + (p['rod_length'][0]/2) ** 2 ))
-                                      * np.cos( np.pi - np.arctan( p['ball_diameter'][0] / p['rod_length'][0] ) ))
+    radius_centre_of_mass = np.sqrt(    ((p['distance_to_pivot'][0] + p['rod_length'][0]/2) ** 2 )
+                                        + ( ((p['ball_mass'][0] ** 2 )  * ( (p['ball_diameter'][0] + p['rod_thickness'][0]) ** 2
+                                        + p['rod_length'][0] ** 2 )) / ( 4 * (p['ball_mass'][0] + p['rod_mass'][0]) ** 2))
+                                        + (( (p['ball_mass'][0] * p['rod_length'][0] ) / (p['ball_mass'][0] + p['rod_mass'][0]) )
+                                        * (p['distance_to_pivot'][0] + p['rod_length'][0] / 2))
+                                        )
 
-    Δp, l_r, m_b, m_r, d = sp.symbols('Δp l_r m_b m_r d')
-    expr_radius_centre_of_mass = sp.sqrt(
-        (Δp + (l_r / 2)) ** 2 +
-        ( (m_b / (m_b + m_r)) * sp.sqrt(  (d / 2) ** 2 + (l_r / 2) ** 2)  ) ** 2 -
-        (2 * (Δp + (l_r / 2)) * (  (m_b / (m_b + m_r)) * sp.sqrt(  (d / 2) ** 2 + (l_r / 2) ** 2)  ) *
-        sp.cos(sp.pi - sp.atan(d / l_r)))
-    )
+
+
+    Δp, l_r, m_b, d_b, t_r, m_r = sp.symbols('Δp l_r m_b d_b t_r m_r')
+    expr_radius_centre_of_mass = sp.sqrt(  ((Δp + l_r/2) ** 2)
+                                           + (((m_b) ** 2 * (  (d_b + t_r) ** 2 + (l_r) ** 2)) / (4 * ((m_b + m_r) ** 2)))
+                                           + (  ( (m_b * l_r) / (m_b + m_r) ) * (Δp + l_r/2) )
+                                        )
 
     radius_centre_of_mass_variance = variance_propagation(
         my_function=expr_radius_centre_of_mass,
         distance_to_pivot=[p['distance_to_pivot'], Dependence.INDEPENDENT, Δp],
         rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
         ball_mass=[p['ball_mass'], Dependence.INDEPENDENT, m_b],
-        rod_mass=[p['rod_mass'], Dependence.INDEPENDENT, m_r],
-        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d]
+        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
+        rod_thickness=[p['rod_thickness'], Dependence.INDEPENDENT, t_r],
+        rod_mass=[p['rod_mass'], Dependence.INDEPENDENT, m_r]
     )
-
 
 
     radius_centre_of_mass_standard_deviation = np.sqrt(radius_centre_of_mass_variance)

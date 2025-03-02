@@ -17,7 +17,7 @@ DO_PLOT = False
 
 #  SET 3 IS METAL rod 1
 
-# SET 5 is Wooden rod
+# SET 5 is Wooden rod 1
 
 params_dict = {
     'set1': {
@@ -27,7 +27,8 @@ params_dict = {
         'method': Experiment.DOUBLE_STRING,
 
         'video_rate' : 60,
-        'camera_rate' : 60
+        'camera_rate' : 60,
+        'focal_length': (24 * 1920) / 8
     },
     'set2': {
         'hypotenuse': (2.010, 0.5E-3),
@@ -36,43 +37,47 @@ params_dict = {
         'method': Experiment.DOUBLE_STRING,
 
         'video_rate' : 60,
-        'camera_rate' : 60
+        'camera_rate' : 60,
+        'focal_length': (24 * 1920) / 8
     },
     'set3': {
         'rod_length': (1, 0.5E-3),
-        'distance_to_pivot': (4E-3, 0.02E-2),
-        'rod_thickness': (1.8E-3, 0.02E-2),
+        'distance_to_pivot': (4E-3, 0.02E-3),
+        'rod_thickness': (1.8E-3, 0.02E-3),
         'rod_mass': (142.8E-3, 0.2E-3),
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
 
         'video_rate': 240,
-        'camera_rate': 29.97
+        'camera_rate': 29.97,
+        'focal_length': (24 * 1920) / 8
     },
     'set4': {
         'rod_length': (1, 0.5E-3),
-        'distance_to_pivot': (4E-3, 0.02E-2),
-        'rod_thickness': (1.8E-3, 0.02E-2),
+        'distance_to_pivot': (4E-3, 0.02E-3),
+        'rod_thickness': (1.8E-3, 0.02E-3),
         'rod_mass': (142.8E-3, 0.2E-3),
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
 
         'video_rate': 240,
-        'camera_rate': 29.97
+        'camera_rate': 29.97,
+        'focal_length': (24 * 1920) / 8
     },
     'set5': {
         'rod_length': (1, 4E-3),
-        'distance_to_pivot': (9.5E-3, 0.02E-2),
-        'rod_thickness': (5.4E-3, 0.02E-2),
+        'distance_to_pivot': (9.5E-3, 0.02E-3),
+        'rod_thickness': (5.4E-3, 0.02E-3),
         'rod_mass': (111.6E-3, 0.2E-3),
         'ball_diameter': (30E-3, 0.03E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.COMPOUND_PENDULUM,
 
         'video_rate': 240,
-        'camera_rate': 29.97
+        'camera_rate': 29.97,
+        'focal_length': (24 * 1920) / 8
     }
 }
 

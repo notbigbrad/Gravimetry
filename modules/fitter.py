@@ -44,18 +44,34 @@ def double_string_pendulum(p):
 
 def compound_pendulum(p):
 
-    ball_radius = np.sqrt((p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2 + ((p['ball_diameter'][0] + p['rod_thickness'][0]) / 2) ** 2)
+    if p['ball_diameter'][0] != 0:
 
-    l_r, Δp, d_b, t_r = sp.symbols('l_r Δp d_b t_r')
-    expr_ball_offset = sp.sqrt((l_r + Δp) ** 2 + ((d_b + t_r)/ 2) ** 2)
+        ball_radius = np.sqrt((p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2 + ((p['ball_diameter'][0] + p['rod_thickness'][0]) / 2) ** 2)
 
-    ball_radius_variance = variance_propagation(
-        my_function=expr_ball_offset,
-        rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
-        distance_to_pivot=[p['distance_to_pivot'], Dependence.INDEPENDENT, Δp],
-        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
-        rod_thickness=[p['rod_thickness'], Dependence.INDEPENDENT, t_r]
-    )
+        l_r, Δp, d_b, t_r = sp.symbols('l_r Δp d_b t_r')
+        expr_ball_offset = sp.sqrt((l_r + Δp) ** 2 + ((d_b + t_r)/ 2) ** 2)
+
+        ball_radius_variance = variance_propagation(
+            my_function=expr_ball_offset,
+            rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
+            distance_to_pivot=[p['distance_to_pivot'], Dependence.INDEPENDENT, Δp],
+            ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
+            rod_thickness=[p['rod_thickness'], Dependence.INDEPENDENT, t_r]
+        )
+
+    else:
+
+        ball_radius = p['rod_length'][0] + p['distance_to_pivot'][0]
+
+        l_r, Δp = sp.symbols('l_r Δp')
+        expr_ball_offset = l_r + Δp
+
+        ball_radius_variance = variance_propagation(
+            my_function=expr_ball_offset,
+            rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
+            distance_to_pivot=[p['distance_to_pivot'], Dependence.INDEPENDENT, Δp]
+        )
+
 
     ball_radius_standard_deviation = np.sqrt(ball_radius_variance)
 
@@ -128,7 +144,7 @@ def compound_pendulum(p):
 
 
 def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,  do_plot=False,
-                    camera_rate=60, video_rate=60, focal_length=(24 * 1920) / 8):
+                    ):
 
     # ----------- PRE-PROCESSING  -----------
     time, x, _ = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T
@@ -136,7 +152,7 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
     time = time[cut::] * (parameters['camera_rate']/parameters['video_rate'])
     x = x[cut::]  # -- get the data and trim it
 
-    x = np.arctan(x / focal_length)  # focalLength (px) = focalLength (mm) * width (px) / width (mm)
+    x = np.arctan(x / parameters['focal_length'])  # focalLength (px) = focalLength (mm) * width (px) / width (mm)
 
 
 
@@ -223,7 +239,7 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     g_standard_deviation = np.sqrt(g_variance)
 
-    print(f'g: {g} +- {g_standard_deviation} ms^-2')
+    print(f' {filename} - g: {g} +- {g_standard_deviation} ms^-2')
 
     return [g, g_standard_deviation]
 

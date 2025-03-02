@@ -9,7 +9,7 @@ from modules.Enums import Experiment
 fileNames = os.listdir('../data/')
 REGEX_PATTERN = r"^set\d+\.csv$"
 g = []
-DO_PLOT = False
+DO_PLOT = True
 # ---PARAMETER CONFIG---
 
 # sets 1,2 performed on 23/02/25
@@ -27,7 +27,8 @@ params_dict = {
         'method': Experiment.DOUBLE_STRING,
 
         'video_rate' : 60,
-        'camera_rate' : 60
+        'camera_rate' : 60,
+        'focal_length': (24 * 1920) / 8
     },
     'set2': {
         'hypotenuse': (2.010, 0.5E-3),
@@ -36,7 +37,8 @@ params_dict = {
         'method': Experiment.DOUBLE_STRING,
 
         'video_rate' : 60,
-        'camera_rate' : 60
+        'camera_rate' : 60,
+        'focal_length': (24 * 1920) / 8
     },
     'set3': {
         'rod_length': (1, 0.5E-3),
@@ -48,7 +50,8 @@ params_dict = {
         'method': Experiment.COMPOUND_PENDULUM,
 
         'video_rate': 240,
-        'camera_rate': 29.97
+        'camera_rate': 29.97,
+        'focal_length': (24 * 1920) / 8
     },
     'set4': {
         'rod_length': (1, 0.5E-3),
@@ -60,7 +63,8 @@ params_dict = {
         'method': Experiment.COMPOUND_PENDULUM,
 
         'video_rate': 240,
-        'camera_rate': 29.97
+        'camera_rate': 29.97,
+        'focal_length': (24 * 1920) / 8
     },
     'set5': {
         'rod_length': (1, 4E-3),
@@ -72,7 +76,8 @@ params_dict = {
         'method': Experiment.COMPOUND_PENDULUM,
 
         'video_rate': 240,
-        'camera_rate': 29.97
+        'camera_rate': 29.97,
+        'focal_length': (24 * 1920) / 8
     }
 }
 

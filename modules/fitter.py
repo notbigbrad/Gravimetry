@@ -1,7 +1,5 @@
 import numpy as np
 import scipy.optimize
-from scipy.special.cython_special import radian
-
 from modules.error_propagation import variance_propagation, sp
 from modules.modelling import under_damped_pendulum as model, linear_function
 from modules.Enums import Experiment, Dependence
@@ -10,6 +8,9 @@ from modules.plotter import plot_now, do_plot_go
 
 def double_string_pendulum(p):
 
+    if isinstance(p['hypotenuse'][0], list):
+        p['hypotenuse'][1] = np.std(p['hypotenuse'][0])
+        p['hypotenuse'][0] = np.mean(p['hypotenuse'][0])
 
     effective_length = np.sqrt(p['hypotenuse'][0] ** 2 - (p['horizontal'][0] / 2) ** 2)
 
@@ -151,7 +152,8 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
     elif parameters['method'] == Experiment.COMPOUND_PENDULUM:
         vertical_length, vertical_length_standard_deviation, moment_of_inertia, moment_of_inertia_standard_deviation = compound_pendulum(parameters)
 
-
+    else:
+        quit()
 
     bounds = [[0.99, 0.0001, 0.1, -np.pi], [1.01, 100, 10, np.pi]]
     initial_guess = [1, 0.1, np.sqrt(9.81 / vertical_length), phase_guess] # A0, gamma, omega, phi
@@ -204,8 +206,6 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
         )
 
     elif parameters['method'] == Experiment.COMPOUND_PENDULUM:
-
-        m = parameters['ball_mass'][0] + parameters['rod_mass'][0]
 
         g = (omega_naught ** 2 * moment_of_inertia) / ((parameters['ball_mass'][0] + parameters['rod_mass'][0]) * vertical_length)
 

@@ -59,8 +59,8 @@ params_dict = {
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
 
-        'video_rate': 60,
-        'camera_rate': 60
+        'video_rate': 240,
+        'camera_rate': 29.97
     },
     'set5': {
         'rod_length': (1, 4E-3),

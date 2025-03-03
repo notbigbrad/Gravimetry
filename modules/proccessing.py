@@ -9,7 +9,7 @@ from modules.Enums import Experiment
 fileNames = os.listdir('../data/')
 REGEX_PATTERN = r"^set\d+\.csv$"
 g = []
-DO_PLOT = True
+DO_PLOT = False
 # ---PARAMETER CONFIG---
 
 # sets 1,2 performed on 23/02/25
@@ -50,7 +50,7 @@ params_dict = {
         'method': Experiment.COMPOUND_PENDULUM,
 
         'video_rate': 240,
-        'camera_rate': 29.97,
+        'camera_rate': 30,
         'focal_length': (24 * 1920) / 8
     },
     'set4': {
@@ -76,7 +76,7 @@ params_dict = {
         'method': Experiment.COMPOUND_PENDULUM,
 
         'video_rate': 240,
-        'camera_rate': 29.97,
+        'camera_rate': 30,
         'focal_length': (24 * 1920) / 8
     }
 }

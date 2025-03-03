@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.optimize
-from modules.error_propagation import variance_propagation, sp
+from modules.error_propagation import evaluation_with_error, sp
 from modules.modelling import under_damped_pendulum as model, linear_function
 from modules.Enums import Experiment, Dependence
 from modules.plotter import plot_now, do_plot_go
@@ -12,12 +12,10 @@ def double_string_pendulum(p):
         p['hypotenuse'][1] = np.std(p['hypotenuse'][0])
         p['hypotenuse'][0] = np.mean(p['hypotenuse'][0])
 
-    effective_length = np.sqrt(p['hypotenuse'][0] ** 2 - (p['horizontal'][0] / 2) ** 2)
-
     h, d = sp.symbols('h d')
     expr_length = sp.sqrt(h ** 2 - (d / 2) ** 2)
 
-    effective_length_variance = variance_propagation(
+    effective_length, effective_length_variance = evaluation_with_error(
         my_function=expr_length,
         hypotenuse=[p['hypotenuse'], Dependence.INDEPENDENT, h],
         horizontal=[p['horizontal'], Dependence.INDEPENDENT, d]
@@ -25,13 +23,10 @@ def double_string_pendulum(p):
 
     effective_length_standard_deviation = np.sqrt(effective_length_variance)
 
-
-    effective_length_with_ball = effective_length + p['ball_diameter'][0] / 2
-
     l, d = sp.symbols('l d')
     expr_length_with_ball = l + d / 2
 
-    effective_length_with_ball_variance = variance_propagation(
+    effective_length_with_ball, effective_length_with_ball_variance = evaluation_with_error(
         my_function=expr_length_with_ball,
         effective_length=[(effective_length, effective_length_standard_deviation), Dependence.INDEPENDENT, l],
         ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d]
@@ -46,12 +41,10 @@ def compound_pendulum(p):
 
     if p['ball_diameter'][0] != 0:
 
-        ball_radius = np.sqrt((p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2 + ((p['ball_diameter'][0] + p['rod_thickness'][0]) / 2) ** 2)
-
         l_r, Δp, d_b, t_r = sp.symbols('l_r Δp d_b t_r')
         expr_ball_offset = sp.sqrt((l_r + Δp) ** 2 + ((d_b + t_r)/ 2) ** 2)
 
-        ball_radius_variance = variance_propagation(
+        ball_radius, ball_radius_variance = evaluation_with_error(
             my_function=expr_ball_offset,
             rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
             distance_to_pivot=[p['distance_to_pivot'], Dependence.INDEPENDENT, Δp],
@@ -61,12 +54,10 @@ def compound_pendulum(p):
 
     else:
 
-        ball_radius = p['rod_length'][0] + p['distance_to_pivot'][0]
-
         l_r, Δp = sp.symbols('l_r Δp')
         expr_ball_offset = l_r + Δp
 
-        ball_radius_variance = variance_propagation(
+        ball_radius, ball_radius_variance = evaluation_with_error(
             my_function=expr_ball_offset,
             rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
             distance_to_pivot=[p['distance_to_pivot'], Dependence.INDEPENDENT, Δp]
@@ -75,13 +66,10 @@ def compound_pendulum(p):
 
     ball_radius_standard_deviation = np.sqrt(ball_radius_variance)
 
-
-    rod_linear_density = p['rod_mass'][0] / p['rod_length'][0]
-
     m, l = sp.symbols('m l')
     expr_rod_linear_density = m / l
 
-    rod_linear_density_variance = variance_propagation(
+    rod_linear_density, rod_linear_density_variance = evaluation_with_error(
         my_function=expr_rod_linear_density,
         rod_mass=[p['rod_mass'], Dependence.INDEPENDENT, m],
         rod_length=[p['rod_length'], Dependence.INDEPENDENT, l]
@@ -89,19 +77,12 @@ def compound_pendulum(p):
 
     rod_linear_density_standard_deviation = np.sqrt(rod_linear_density_variance)
 
-
-    moment_of_inertia = (
-            (p['ball_mass'][0] * ball_radius ** 2)
-            + (1 / 3 * (rod_linear_density * (p['rod_length'][0] + p['distance_to_pivot'][0])) * (p['rod_length'][0] + p['distance_to_pivot'][0]) ** 2)
-            - (1 / 3 * (rod_linear_density * p['distance_to_pivot'][0]) * p['distance_to_pivot'][0] ** 2)
-    )
-
     m_b, r_b, l_r, λ, Δp  = sp.symbols('m_b r_b l_r λ Δp')
     expr_moment_of_inertia = (   (m_b * r_b ** 2)
                                 +(1 / 3 * λ * (l_r + Δp) * (l_r + Δp) ** 2)
-                                - (1 / 3 * λ * Δp * Δp ** 2))
+                                -(1 / 3 * λ * Δp * Δp ** 2))
 
-    moment_of_inertia_variance = variance_propagation(
+    moment_of_inertia, moment_of_inertia_variance = evaluation_with_error(
         my_function=expr_moment_of_inertia,
         ball_mass=[p['ball_mass'], Dependence.INDEPENDENT, m_b],
         ball_radius=[(ball_radius, ball_radius_standard_deviation), Dependence.INDEPENDENT, r_b],
@@ -112,14 +93,6 @@ def compound_pendulum(p):
 
     moment_of_inertia_standard_deviation = np.sqrt(moment_of_inertia_variance)
 
-    radius_centre_of_mass = np.sqrt(    ((p['distance_to_pivot'][0] + p['rod_length'][0]/2) ** 2 )
-                                        + ( ((p['ball_mass'][0] ** 2 )  * ( (p['ball_diameter'][0] + p['rod_thickness'][0]) ** 2
-                                        + p['rod_length'][0] ** 2 )) / ( 4 * (p['ball_mass'][0] + p['rod_mass'][0]) ** 2))
-                                        + (( (p['ball_mass'][0] * p['rod_length'][0] ) / (p['ball_mass'][0] + p['rod_mass'][0]) )
-                                        * (p['distance_to_pivot'][0] + p['rod_length'][0] / 2))
-                                        )
-
-
 
     Δp, l_r, m_b, d_b, t_r, m_r = sp.symbols('Δp l_r m_b d_b t_r m_r')
     expr_radius_centre_of_mass = sp.sqrt(  ((Δp + l_r/2) ** 2)
@@ -127,7 +100,7 @@ def compound_pendulum(p):
                                            + (  ( (m_b * l_r) / (m_b + m_r) ) * (Δp + l_r/2) )
                                         )
 
-    radius_centre_of_mass_variance = variance_propagation(
+    radius_centre_of_mass, radius_centre_of_mass_variance = evaluation_with_error(
         my_function=expr_radius_centre_of_mass,
         distance_to_pivot=[p['distance_to_pivot'], Dependence.INDEPENDENT, Δp],
         rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
@@ -137,8 +110,32 @@ def compound_pendulum(p):
         rod_mass=[p['rod_mass'], Dependence.INDEPENDENT, m_r]
     )
 
-
     radius_centre_of_mass_standard_deviation = np.sqrt(radius_centre_of_mass_variance)
+
+    # m_b, d_b, t_r, r_0, m_r = sp.symbols('m_b d_b t_r r_0 m_r')
+    # expr_delta = sp.asin((m_b * (d_b + t_r)) / (2 * r_0 * (m_b + m_r)))
+    #
+    # delta, delta_variance = evaluation_with_error(
+    #     my_function=expr_delta,
+    #     ball_mass=[p['ball_mass'], Dependence.INDEPENDENT, m_b],
+    #     ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
+    #     rod_thickness=[p['rod_thickness'], Dependence.INDEPENDENT, t_r],
+    #     radius_centre_of_mass=[[radius_centre_of_mass,radius_centre_of_mass_standard_deviation], Dependence.INDEPENDENT, r_0],
+    #     rod_mass=[p['rod_mass'], Dependence.INDEPENDENT, m_r]
+    # )
+    #
+    # delta_standard_deviation = np.sqrt(delta_variance)
+    #
+    # r_0, δ = sp.symbols('r_0 δ')
+    # expr_radial_projection = r_0 * sp.cos(δ)
+    #
+    # radial_projection, radial_projection_variance = evaluation_with_error(
+    #     my_function=expr_radial_projection,
+    #     radius_centre_of_mass=[[radius_centre_of_mass,radius_centre_of_mass_standard_deviation], Dependence.INDEPENDENT, r_0],
+    #     delta=[[delta, delta_standard_deviation], Dependence.INDEPENDENT, δ]
+    # )
+    #
+    # radial_projection_standard_deviation = np.sqrt(radial_projection_variance)
 
     return radius_centre_of_mass, radius_centre_of_mass_standard_deviation, moment_of_inertia, moment_of_inertia_standard_deviation
 
@@ -147,8 +144,8 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     # ----------- PRE-PROCESSING  -----------
     time, x, _ = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T
-    time = time - np.min(time)
     time = time[cut::] * (parameters['camera_rate']/parameters['video_rate'])
+    time = time - np.min(time)
     x = x[cut::]  # -- get the data and trim it
 
     x = np.arctan(x / parameters['focal_length'])  # focalLength (px) = focalLength (mm) * width (px) / width (mm)
@@ -171,7 +168,7 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
         quit()
 
     bounds = [[0.99, 0.0001, 0.1, -np.pi], [1.01, 100, 10, np.pi]]
-    initial_guess = [1, 0.1, np.sqrt(9.81 / vertical_length), phase_guess] # A0, gamma, omega, phi
+    initial_guess = [1, 0.1, np.sqrt(9.81 / vertical_length), np.pi/4] # A0, gamma, omega, phi
 
 
 
@@ -193,12 +190,11 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     gamma = optimal[1]
     omega = optimal[2]
-    omega_naught = np.sqrt(gamma**2 + omega**2)
 
     ω, γ= sp.symbols('ω γ')
     expr_omega_naught = sp.sqrt(ω ** 2 + γ ** 2)
 
-    omega_naught_variance = variance_propagation(
+    omega_naught, omega_naught_variance = evaluation_with_error(
         my_function=expr_omega_naught,
         covariance_matrix=covariance_matrix[1:3, 1:3],
         omega=[(omega, None), Dependence.COVARIANT, ω],
@@ -209,12 +205,11 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     if parameters['method'] == Experiment.DOUBLE_STRING:
 
-        g = (omega_naught ** 2) * vertical_length
 
         ω_0, l = sp.symbols('ω_0 l')
         expr_g = (ω_0 ** 2) * l
 
-        g_variance = variance_propagation(
+        g, g_variance = evaluation_with_error(
             my_function=expr_g,
             omega_naught=[(omega_naught, omega_naught_standard_deviation), Dependence.INDEPENDENT, ω_0],
             length = [(vertical_length, vertical_length_standard_deviation), Dependence.INDEPENDENT, l]
@@ -222,12 +217,12 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     elif parameters['method'] == Experiment.COMPOUND_PENDULUM:
 
-        g = (omega_naught ** 2 * moment_of_inertia) / ((parameters['ball_mass'][0] + parameters['rod_mass'][0]) * vertical_length)
+
 
         ω_0, I, b_m, r_m, l = sp.symbols('ω_0 I b_m r_m l')
         expr_g = (ω_0 ** 2 * I) / ((b_m + r_m) * l)
 
-        g_variance = variance_propagation(
+        g, g_variance = evaluation_with_error(
             my_function=expr_g,
             omega_naught=[(omega_naught, omega_naught_standard_deviation), Dependence.INDEPENDENT, ω_0],
             moment_of_inertia=[(moment_of_inertia, moment_of_inertia_standard_deviation), Dependence.INDEPENDENT, I],
@@ -241,8 +236,6 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
     print(f' {filename} - g: {g} +- {g_standard_deviation} ms^-2')
 
     return [g, g_standard_deviation]
-
-
 
 
 def fitting_g(g):

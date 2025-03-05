@@ -144,7 +144,7 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     # ----------- PRE-PROCESSING  -----------
     time, x, _ = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T
-    time = time[cut::] * (parameters['camera_rate']/parameters['video_rate'])
+    time = time[cut::] * (parameters['playback_rate']/parameters['capture_rate'])
     time = time - np.min(time)
     x = x[cut::]  # -- get the data and trim it
 

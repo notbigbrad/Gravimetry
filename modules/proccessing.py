@@ -26,8 +26,8 @@ params_dict = {
         'ball_diameter': (30E-3, 0.03E-3),
         'method': Experiment.DOUBLE_STRING,
 
-        'video_rate' : 60,
-        'camera_rate' : 60,
+        'capture_rate' : 60,
+        'playback_rate' : 60,
         'focal_length': (24 * 1920) / 8
     },
     'set2': {
@@ -36,8 +36,8 @@ params_dict = {
         'ball_diameter': (30E-3, 0.03E-3),
         'method': Experiment.DOUBLE_STRING,
 
-        'video_rate' : 60,
-        'camera_rate' : 60,
+        'capture_rate' : 60,
+        'playback_rate' : 60,
         'focal_length': (24 * 1920) / 8
     },
     'set3': {
@@ -49,8 +49,8 @@ params_dict = {
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
 
-        'video_rate': 240,
-        'camera_rate': 30,
+        'capture_rate': 240,
+        'playback_rate': 30,
         'focal_length': (24 * 1920) / 8
     },
     'set4': {
@@ -62,8 +62,8 @@ params_dict = {
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
 
-        'video_rate': 240,
-        'camera_rate': 29.97,
+        'capture_rate': 240,
+        'playback_rate': 30,
         'focal_length': (24 * 1920) / 8
     },
     'set5': {
@@ -75,8 +75,8 @@ params_dict = {
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.COMPOUND_PENDULUM,
 
-        'video_rate': 240,
-        'camera_rate': 30,
+        'capture_rate': 240,
+        'playback_rate': 30,
         'focal_length': (24 * 1920) / 8
     }
 }

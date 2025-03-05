@@ -74,17 +74,69 @@ for i in range(len(positionData)):
     print(np.array(positionData[i][1:3]).shape)
     angularData.append([positionData[i][0], angle(np.array(positionData[i][1:3]), pivots[i])])
 
-print(angularData[0])
-
-for i in range(len(angularData)):
-        plt.figure(figsize=[10,7])
-        plt.axis("off")
-        plt.subplot(211)
-        plt.scatter(angularData[i][0], angularData[i][1], color="red", marker="+", linewidths=1, label="theta")
-        plt.axhline(y=0, color="red", linestyle="-")
-        plt.legend()
-        plt.show()
+# for i in range(len(angularData)):
+        # plt.figure(figsize=[10,7])
+        # plt.axis("off")
+        # plt.subplot(211)
+        # plt.scatter(angularData[i][0], angularData[i][1], color="red", marker="+", linewidths=1, label="theta")
+        # plt.axhline(y=0, color="red", linestyle="-")
+        # plt.legend()
+        # plt.show()
 
 # Fit model to data
+
+for i in angularData:
+
+    time, theta = i
+        
+    # Initial guesses
+    I = [0.007, 0.1, np.sqrt(9.81/l), np.pi/4] # A0, gamma, omega, phi
+
+    # Bounds
+    bounds = [[0.0001,0.0001,0.1,-np.pi],[0.01,1,10,np.pi]] # bounds on the fitting function
+
+    # Fit model
+    optimal, covariance = scipy.optimize.curve_fit(physicalPendulum, time, theta, p0=I, bounds=bounds, maxfev=1*10**9)
+
+    # Check pendulum is lightly-damped
+    # if(optimal[1]**2 >= np.sqrt(optimal[2]**2 + optimal[1]**2)): quit("Scheiße: pendulum is not lightly-damped")
+
+    # Find natural frequency
+    # o^2 = o0^2 - gamma^2
+    o0 = np.sqrt(optimal[2]**2 + optimal[1]**2)
+    # o0Std = sqrt(o0,optimal[2],optimal[1],np.sqrt(covariance[2,2]),np.sqrt(covariance[1,1]),0, "+") # cov should be np.sqrt(covariance[1,2]) instead 0
+
+    # Calculate g
+    # o0^2 = mgro+ / I0
+    # g = o0^2*I0 / mro+
+    g = float()
+    gStd = float()
+    g = (o0**2)*l
+    # gStd = mul(g,o0**2,l,squared(o0,o0Std),lstd,0) # Assuming omega0 and l are not covariant
+
+    print(f'g: {g} +- {gStd} ms^-2')
+
+    # Calculate residuals
+    r = theta - physicalPendulum(np.linspace(np.min(time),np.max(time),len(time)), optimal[0], optimal[1], optimal[2], optimal[3])
+
+    # Plot output
+    tSpace = np.linspace(np.min(time),np.max(time),10000)
+
+    plt.figure(figsize=[10,7])
+    plt.suptitle("plt")
+    plt.axis("off")
+    plt.subplot(211)
+    plt.title("Data Plot with Fitted Model")
+    plt.fill_between(time, theta-0, theta+0, color="lightgray")
+    plt.scatter(time, theta, color="red", marker="+", linewidths=1, label="Data")
+    plt.plot(tSpace, physicalPendulum(tSpace, optimal[0], optimal[1], optimal[2], optimal[3]), label="Mathematical Pendulum Model")
+    # plt.plot(tSpace, sin(tSpace, np.sqrt(9.81/l), 0), "g--", label="Theoretical")
+    plt.legend()
+    plt.subplot(212)
+    plt.title("Residual")
+    plt.plot(time, theta*0.05, color="lightgray")
+    plt.plot(time, r, color="black")
+    plt.show()
+
 
 # Propogate errors and find final value

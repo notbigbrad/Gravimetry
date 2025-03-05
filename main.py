@@ -2,9 +2,11 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
+from modules.error_and_evalutation import evaluation_with_error
 from modules.position import *
 from modules.model import *
 from modules.error import *
+import sympy as sp
 
 # Perfrom pre-processing
 
@@ -76,19 +78,45 @@ for i in dRaw:
     d.append(a/2)
     dStd.append(b/2)
 
-x = np.array(x)
+x_legs = np.array(x)
 xStd = np.array(xStd)
-d = np.array(d)
+d_horizontal = np.array(d)
 dStd = np.array(dStd)
 
-l = np.sqrt((x)**2 - (d)**2)
+
+x_l, d = sp.symbols('x_l, d')
+expr_l = sp.sqrt( (x_l) **2 -  (d) **2 )
+
+print('-----------------------')
+
+l_ = []
+lStd = []
+
+for i in range(len(x)):
+
+    l, l_variance = evaluation_with_error(
+        my_function=expr_l,
+        legs=[(x_legs[i],xStd[i]),x_l],
+        horizontal=[(d_horizontal[i],dStd[i]),d],
+    )
+
+    l_standard_deviation = np.sqrt(l_variance)
+
+
+    l_.append(l)
+    lStd.append(l_standard_deviation)
+    print(l, l_standard_deviation)
+
+print('------------------')
+
+# l = np.sqrt((x)**2 - (d)**2)
 # Lstd = sqrt(L,x,d,xstd,dstd,0,"-")
 
 # SEM for l possibly
 
 # z = np.linspace(0, len(L) - 1, len(L))
 # l, lcov = scipy.optimize.curve_fit(f, z, L, sigma=Lstd, absolute_sigma=True, maxfev=1*10**9)
-l = l+dBall/2 # Add width of the ball
+# l = l+dBall/2 # Add width of the ball
 # lstd = add(1,1/2,np.sqrt(np.diag(lcov))[0],dBallStd,0)
 
 pivots = []
@@ -129,6 +157,9 @@ for i in range(len(angularData)):
     # Check pendulum is lightly-damped
     # if(optimal[1]**2 >= np.sqrt(optimal[2]**2 + optimal[1]**2)): quit("Scheiße: pendulum is not lightly-damped")
 
+
+
+
     # Find natural frequency
     # o^2 = o0^2 - gamma^2
     # o0 = np.sqrt(optimal[2]**2 + optimal[1]**2)
@@ -141,6 +172,7 @@ for i in range(len(angularData)):
     g = float()
     gStd = float()
     g = (o0**2)*l[i]
+
     # gStd = mul(g,o0**2,l,squared(o0,o0Std),lstd,0) # Assuming omega0 and l are not covariant
 
     print(f'g: {g} +- {gStd} ms^-2')

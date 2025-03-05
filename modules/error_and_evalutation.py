@@ -4,16 +4,16 @@ import sympy as sp
 def evaluation_with_error(my_function, covariance_matrix=None, **kwargs):
 
 
-    input_values = {val[2]: val[0][0] for key, val in kwargs.items()}
+    input_values = {val[1]: val[0][0] for key, val in kwargs.items()}
     covariant_evaluated_partial_derivatives = []
 
-    variables = {key: val[2] for key, val in kwargs.items()}
+    variables = {key: val[1] for key, val in kwargs.items()}
     my_expression = my_function.subs(variables)
 
     evaluation = my_expression.subs(input_values)
     variance = 0
 
-    for key, (value_tuple, dependence, symbol) in kwargs.items():
+    for key, (value_tuple, symbol) in kwargs.items():
         value, parameter_error = value_tuple
 
 

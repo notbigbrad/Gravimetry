@@ -1,0 +1,4 @@
+ASSUMPTIONS
+
+phone is vertical
+phone is parallel to plane of motion

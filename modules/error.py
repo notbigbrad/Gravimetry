@@ -8,6 +8,5 @@ def prop(m, c):
     return numpy.matmul(M.T,numpy.matmul(M,C))
 
 def wghtMn(D):
-
-
+    # return numpy.mean(D), scipy.stats.sem(D)/numpy.sqrt(len(D))
     return numpy.mean(D), numpy.std(D)

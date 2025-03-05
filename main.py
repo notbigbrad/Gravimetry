@@ -8,8 +8,9 @@ from modules.model import *
 from modules.error import *
 import sympy as sp
 from modules.errorProp import *
+# plt.show = lambda : 0 # dissable plot output
 
-# Perfrom pre-processing
+# ============================================================================= Perfrom pre-processing
 
 resolution = [720,1280]
 pixelSize = np.array([7.3,9.8]) / resolution
@@ -49,7 +50,7 @@ zeroPoints = []
 for i in positionData:
     zeroPoints.append(np.mean(i[1]))
 
-# Now find angle subtended by the pendulum
+# ============================================================================= Now find angle subtended by the pendulum
     
 # Find l
 dBall = 0.03
@@ -62,12 +63,13 @@ dRaw = [
     [0.376,0.374,0.375],[0.376,0.374,0.375],
     [0.375,0.376,0.377],[0.375,0.376,0.377],
     [0.380,0.378,0.379],[0.380,0.378,0.379]]
+rawLengthStd = 0.001
 
 x = []
 xStd = []
 
 for i in xRaw:
-    a, b = wghtMn(i)
+    a, b = weightedMean(i, rawLengthStd)
     x.append(a)
     xStd.append(b)
 
@@ -75,48 +77,33 @@ d = []
 dStd = []
 
 for i in dRaw:
-    a, b = wghtMn(i)
+    a, b = weightedMean(i, rawLengthStd)
     d.append(a/2)
     dStd.append(b/2)
-
-x_legs = np.array(x)
+    
+x = np.array(x)
 xStd = np.array(xStd)
-d_horizontal = np.array(d)
+d = np.array(d)
 dStd = np.array(dStd)
 
+xSym, dSym, dBallSym = sp.symbols('xSym, dSym, dBallSym')
+expr_length = sp.sqrt( (xSym) **2 -  (dSym) **2 ) + dBallSym/2
 
-x_l, d = sp.symbols('x_l, d')
-expr_l = sp.sqrt( (x_l) **2 -  (d) **2 )
-
-print('-----------------------')
-
-l_ = []
+l = []
 lStd = []
 
 for i in range(len(x)):
 
-    l, l_variance = evaluation_with_error(
-        my_function=expr_l,
-        legs=[(x_legs[i],xStd[i]),x_l],
-        horizontal=[(d_horizontal[i],dStd[i]),d],
+    l_curr, l_std = evaluation_with_error(
+        my_function=expr_length,
+        legs=[(x[i],xStd[i]),xSym],
+        horizontal=[(d[i],dStd[i]),dSym],
+        ball=[(dBall,dBallStd),dBallSym],
     )
 
-    l_standard_deviation = np.sqrt(l_variance)
-
-
-    l_.append(l)
-    lStd.append(l_standard_deviation)
-    print(l, l_standard_deviation)
-
-print('------------------')
-
-# l = np.sqrt((x)**2 - (d)**2)
-# Lstd = sqrt(L,x,d,xstd,dstd,0,"-")
-
-# SEM for l possibly
-
-# l = l+dBall/2 # Add width of the ball
-# lstd = add(1,1/2,np.sqrt(np.diag(lcov))[0],dBallStd,0)
+    l.append(l_curr)
+    lStd.append(l_std)
+    print(f'l: {l_curr:.5f} +- {l_std:.5f} m')
 
 pivots = []
 
@@ -126,7 +113,6 @@ for i in range(len(zeroPoints)):
 angularData = []
 
 for i in range(len(positionData)):
-    print(np.array(positionData[i][1:3]).shape)
     angularData.append([positionData[i][0], angle(np.array(positionData[i][1:3]), pivots[i])])
 
 # for i in range(len(angularData)):
@@ -138,38 +124,58 @@ for i in range(len(positionData)):
 #         plt.legend()
 #         plt.show()
 
-# Fit model to data
+# ============================================================================= Calculate constants with error
+
+m = 0.109
+r0 = np.array(l)
+I0 = (2/5)*m*(dBall/2)**2 + m*r0**2
+
+# ============================================================================= Fit model to data
+
+g = []
+gStd = []
 
 for i in range(len(angularData)):
 
     time, theta = angularData[i]
         
     # Initial guesses
-    I = [0.03, 0.1, np.sqrt(9.81/l[i]), np.pi/4] # A0, gamma, omega, phi
+    # I = [0.03, 0.1, np.sqrt(9.81/l[i]), np.pi/4] # A0, gamma, omega, phi
+    I = [0, 0, 9.816/4, 0.1] # thet0, om0, g, b ODE
 
     # Bounds
-    bounds = [[0.0001,0.0001,0.1,-np.pi],[0.04,1,10,np.pi]] # bounds on the fitting function
+    # bounds = [[0.0001,0.0001,0.1,-np.pi],[0.04,1,10,np.pi]] # bounds on the fitting function
+    bounds = [[-np.pi,0,9.80/4,0.001],[np.pi,2,9.83/4,0.1]] # bounds on the fitting function ODE
+
+    constants = [m, r0[i], I0[i]] # m, r, I
 
     # Fit model
-    optimal, covariance = scipy.optimize.curve_fit(physicalPendulum, time, theta, p0=I, bounds=bounds, maxfev=1*10**9)
-    # optimal, covariance = scipy.optimize.curve_fit(physicalODE, time, theta, p0=I, bounds=bounds, maxfev=1*10**9)
+    # optimal, covariance = scipy.optimize.curve_fit(physicalPendulum, time, theta, p0=I, bounds=bounds, maxfev=1*10**9)
+    optimal, covariance = scipy.optimize.curve_fit(lambda t, thet0, om0, g, b : physicalODE(t, thet0, om0, g, b, const=constants), time, theta, p0=I, bounds=bounds, maxfev=1*10**9)
 
     # Find natural frequency
-    # o^2 = o0^2 - gamma^2
     # o0 = np.sqrt(optimal[2]**2 + optimal[1]**2)
-    o0 = optimal[2]
-    # o0Std = sqrt(o0,optimal[2],optimal[1],np.sqrt(covariance[2,2]),np.sqrt(covariance[1,1]),0, "+") # cov should be np.sqrt(covariance[1,2]) instead 0
+    # o0Std = sqrt(o0,optimal[2],optimal[1],np.sqrt(covariance[2,2]),np.sqrt(covariance[1,1]),0, "+")
+    # o0 = optimal[2]
+    # o0Std = np.sqrt(covariance[2,2])
 
-    # Calculate g
-    # o0^2 = mgro+ / I0
-    # g = o0^2*I0 / mro+
-    g = float()
-    gStd = float()
-    g = (o0**2)*l[i]
+    # # Calculate g
+    # o0Sym, lSym = sp.symbols('o0Sym, lSym')
+    # expr_g = (o0Sym**2)*lSym
 
-    # gStd = mul(g,o0**2,l,squared(o0,o0Std),lstd,0) # Assuming omega0 and l are not covariant
+    # g_curr, g_std = evaluation_with_error(
+    #     my_function=expr_g,
+    #     omega0=[(o0,o0Std),o0Sym],
+    #     length=[(l[i],lStd[i]),lSym],
+    # )
+    
+    # g.append(g_curr)
+    # gStd.append(g_std)
+    
+    g.append(optimal[2])
+    gStd.append(np.sqrt(covariance[2,2]))
 
-    print(f'g: {g} +- {gStd} ms^-2')
+    print(f'g: {g[i]:.5f} +- {gStd[i]:.5f} ms^-2')
 
     # Calculate residuals
     r = theta - physicalPendulum(np.linspace(np.min(time),np.max(time),len(time)), optimal[0], optimal[1], optimal[2], optimal[3])
@@ -192,4 +198,11 @@ for i in range(len(angularData)):
     plt.plot(time, r, color="black")
     plt.show()
 
-# Propogate errors and find final value
+# ============================================================================= Propogate errors and find final value
+
+q = np.linspace(0, len(g) - 1, len(g))
+optimal, covariance = scipy.optimize.curve_fit(f, q, g, p0=[9.81616], sigma=gStd, maxfev=1*10**9)
+GStd = np.sqrt(covariance[0,0])
+G = optimal[0]
+
+print(f'Final value of g using all experiments: {G:.5f} +- {GStd:.5f} ms^-2')

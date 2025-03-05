@@ -21,7 +21,7 @@ def evaluation_with_error(my_function, covariance_matrix=None, **kwargs):
         independent_evaluated_partial_derivative = independent_partial_derivative.subs(input_values)
         variance += (independent_evaluated_partial_derivative * parameter_error) ** 2
 
-    return np.float64(evaluation), np.float64(variance)
+    return np.float64(evaluation), np.sqrt(np.float64(variance))
 
 # h, d = sp.symbols('h d')
 #     expr_length = sp.sqrt(h ** 2 - (d / 2) ** 2)

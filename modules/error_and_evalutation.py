@@ -22,3 +22,14 @@ def evaluation_with_error(my_function, covariance_matrix=None, **kwargs):
         variance += (independent_evaluated_partial_derivative * parameter_error) ** 2
 
     return np.float64(evaluation), np.float64(variance)
+
+# h, d = sp.symbols('h d')
+#     expr_length = sp.sqrt(h ** 2 - (d / 2) ** 2)
+#
+#     effective_length, effective_length_variance = evaluation_with_error(
+#         my_function=expr_length,
+#         hypotenuse=[p['hypotenuse'], Dependence.INDEPENDENT, h],
+#         horizontal=[p['horizontal'], Dependence.INDEPENDENT, d]
+#     )
+#
+#     effective_length_standard_deviation = np.sqrt(effective_length_variance)

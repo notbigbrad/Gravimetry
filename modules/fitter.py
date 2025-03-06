@@ -17,29 +17,19 @@ def double_string_pendulum(p):
         p['horizontal'][1] = np.std(p['horizontal'][0])
         p['horizontal'][0] = np.mean(p['horizontal'][0])
 
-    h, d = sp.symbols('h d d_b')
-    expr_length = sp.sqrt(h ** 2 - (d / 2) ** 2)
+    h, d, d_b = sp.symbols('h d d_b')
+    expr_length = sp.sqrt(h ** 2 - (d / 2) ** 2) + (d_b/2)
 
     effective_length, effective_length_variance = evaluation_with_error(
         my_function=expr_length,
         hypotenuse=[p['hypotenuse'], Dependence.INDEPENDENT, h],
-        horizontal=[p['horizontal'], Dependence.INDEPENDENT, d]
+        horizontal=[p['horizontal'], Dependence.INDEPENDENT, d],
+        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
     )
 
     effective_length_standard_deviation = np.sqrt(effective_length_variance)
 
-    l, d = sp.symbols('l d')
-    expr_length_with_ball = l + d / 2
-
-    effective_length_with_ball, effective_length_with_ball_variance = evaluation_with_error(
-        my_function=expr_length_with_ball,
-        effective_length=[(effective_length, effective_length_standard_deviation), Dependence.INDEPENDENT, l],
-        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d]
-    )
-
-    effective_length_with_ball_standard_deviation = np.sqrt(effective_length_with_ball_variance)
-
-    return effective_length_with_ball, effective_length_with_ball_standard_deviation
+    return effective_length, effective_length_standard_deviation
 
 
 def compound_pendulum(p):

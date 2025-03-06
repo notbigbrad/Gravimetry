@@ -108,31 +108,6 @@ def compound_pendulum(p):
 
     radius_centre_of_mass_standard_deviation = np.sqrt(radius_centre_of_mass_variance)
 
-    # m_b, d_b, t_r, r_0, m_r = sp.symbols('m_b d_b t_r r_0 m_r')
-    # expr_delta = sp.asin((m_b * (d_b + t_r)) / (2 * r_0 * (m_b + m_r)))
-    #
-    # delta, delta_variance = evaluation_with_error(
-    #     my_function=expr_delta,
-    #     ball_mass=[p['ball_mass'], Dependence.INDEPENDENT, m_b],
-    #     ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
-    #     rod_thickness=[p['rod_thickness'], Dependence.INDEPENDENT, t_r],
-    #     radius_centre_of_mass=[[radius_centre_of_mass,radius_centre_of_mass_standard_deviation], Dependence.INDEPENDENT, r_0],
-    #     rod_mass=[p['rod_mass'], Dependence.INDEPENDENT, m_r]
-    # )
-    #
-    # delta_standard_deviation = np.sqrt(delta_variance)
-    #
-    # r_0, δ = sp.symbols('r_0 δ')
-    # expr_radial_projection = r_0 * sp.cos(δ)
-    #
-    # radial_projection, radial_projection_variance = evaluation_with_error(
-    #     my_function=expr_radial_projection,
-    #     radius_centre_of_mass=[[radius_centre_of_mass,radius_centre_of_mass_standard_deviation], Dependence.INDEPENDENT, r_0],
-    #     delta=[[delta, delta_standard_deviation], Dependence.INDEPENDENT, δ]
-    # )
-    #
-    # radial_projection_standard_deviation = np.sqrt(radial_projection_variance)
-
     return radius_centre_of_mass, radius_centre_of_mass_standard_deviation, moment_of_inertia, moment_of_inertia_standard_deviation
 
 
@@ -154,8 +129,7 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
     if parameters['method'] == Experiment.DOUBLE_STRING:
         vertical_length, vertical_length_standard_deviation = double_string_pendulum(parameters)
 
-        pivot = [np.mean(x), np.mean(y + vertical_length)]
-        subtended_angle = [time, angle([x,y], pivot)]
+
 
     elif parameters['method'] == Experiment.COMPOUND_PENDULUM:
         vertical_length, vertical_length_standard_deviation, moment_of_inertia, moment_of_inertia_standard_deviation = compound_pendulum(parameters)
@@ -163,17 +137,18 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
     else:
         quit()
 
+    pivot = [np.mean(x), np.mean(y + vertical_length)]
+    subtended_angle = angle([x, y], pivot)
 
-
-    bounds = [[0.99, 0.0001, 0.1, -np.pi], [1.01, 100, 10, np.pi]]
-    initial_guess = [1, 0.1, np.sqrt(9.81 / vertical_length), np.pi/4] # A0, gamma, omega, phi
+    bounds = [[0.0001,0.0001,0.1,-np.pi],[0.04,1,10,np.pi]]
+    initial_guess = [0.03, 0.1, np.sqrt(9.81 / vertical_length), np.pi/4] # A0, gamma, omega, phi
 
 
 
 
     #----------- FITTING & RESIDUALS -----------
     optimal, covariance_matrix = (scipy.optimize.curve_fit
-                           (model, time, x,
+                           (model, time, subtended_angle,
                             p0=initial_guess, bounds=bounds, sigma=tracking_error,
                             absolute_sigma=True, maxfev=1*10**9))
 

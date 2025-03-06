@@ -12,6 +12,10 @@ def double_string_pendulum(p):
         p['hypotenuse'][1] = np.std(p['hypotenuse'][0])
         p['hypotenuse'][0] = np.mean(p['hypotenuse'][0])
 
+    if isinstance(p['horizontal'][0], list):
+        p['horizontal'][1] = np.std(p['horizontal'][0])
+        p['horizontal'][0] = np.mean(p['horizontal'][0])
+
     h, d = sp.symbols('h d')
     expr_length = sp.sqrt(h ** 2 - (d / 2) ** 2)
 

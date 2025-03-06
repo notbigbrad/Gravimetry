@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.optimize
+from modules.camera_processing import true_position, angle
 from modules.error_propagation import evaluation_with_error, sp
 from modules.modelling import under_damped_pendulum as model, linear_function
 from modules.Enums import Experiment, Dependence
@@ -16,7 +17,7 @@ def double_string_pendulum(p):
         p['horizontal'][1] = np.std(p['horizontal'][0])
         p['horizontal'][0] = np.mean(p['horizontal'][0])
 
-    h, d = sp.symbols('h d')
+    h, d = sp.symbols('h d d_b')
     expr_length = sp.sqrt(h ** 2 - (d / 2) ** 2)
 
     effective_length, effective_length_variance = evaluation_with_error(
@@ -81,14 +82,15 @@ def compound_pendulum(p):
 
     rod_linear_density_standard_deviation = np.sqrt(rod_linear_density_variance)
 
-    m_b, r_b, l_r, λ, Δp  = sp.symbols('m_b r_b l_r λ Δp')
-    expr_moment_of_inertia = (   (m_b * r_b ** 2)
+    m_b, d_b, r_b, l_r, λ, Δp  = sp.symbols('m_b d_b r_b l_r λ Δp')
+    expr_moment_of_inertia = (   ( (2/5 * m_b * (d_b/2) ** 2 ) + (m_b * r_b ** 2))
                                 +(1 / 3 * λ * (l_r + Δp) * (l_r + Δp) ** 2)
                                 -(1 / 3 * λ * Δp * Δp ** 2))
 
     moment_of_inertia, moment_of_inertia_variance = evaluation_with_error(
         my_function=expr_moment_of_inertia,
         ball_mass=[p['ball_mass'], Dependence.INDEPENDENT, m_b],
+        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
         ball_radius=[(ball_radius, ball_radius_standard_deviation), Dependence.INDEPENDENT, r_b],
         rod_length=[p['rod_length'], Dependence.INDEPENDENT, l_r],
         rod_linear_density=[(rod_linear_density, rod_linear_density_standard_deviation), Dependence.INDEPENDENT, λ],
@@ -147,29 +149,31 @@ def compound_pendulum(p):
 def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,  do_plot=False):
 
     # ----------- PRE-PROCESSING  -----------
-    time, x, _ = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T
-    time = time[cut::] * (parameters['playback_rate']/parameters['capture_rate'])
-    time = time - np.min(time)
-    x = x[cut::]  # -- get the data and trim it
+    time, raw_x, raw_y = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig")[parameters['slice_bounds'][0]:parameters['slice_bounds'][1]].T
+    time = np.linspace(0, max(time) - min(time), len(time)) / (parameters['capture_rate'] / parameters['playback_rate'])
 
-    x = np.arctan(x / parameters['focal_length'])  # focalLength (px) = focalLength (mm) * width (px) / width (mm)
+    if 'z_distance' in parameters.keys():
+        x, y = true_position(raw_x, raw_y, pixel_size=parameters['pixel_size'], resolution=parameters['resolution'], focal_length=parameters['focal_length'], z_distance=parameters['z_distance'])
 
+        position_data = [time, x, y]
+        zero_point = np.mean(x)
 
-
-    x = x - np.min(x)
-    x = x - np.max(x) / 2
-    x = x / np.max(x)  # Normalisation
 
     #----------- METHODOLOGY PROCESSING -----------
 
     if parameters['method'] == Experiment.DOUBLE_STRING:
         vertical_length, vertical_length_standard_deviation = double_string_pendulum(parameters)
 
+        pivot = [np.mean(x), np.mean(y + vertical_length)]
+        subtended_angle = [time, angle([x,y], pivot)]
+
     elif parameters['method'] == Experiment.COMPOUND_PENDULUM:
         vertical_length, vertical_length_standard_deviation, moment_of_inertia, moment_of_inertia_standard_deviation = compound_pendulum(parameters)
 
     else:
         quit()
+
+
 
     bounds = [[0.99, 0.0001, 0.1, -np.pi], [1.01, 100, 10, np.pi]]
     initial_guess = [1, 0.1, np.sqrt(9.81 / vertical_length), np.pi/4] # A0, gamma, omega, phi

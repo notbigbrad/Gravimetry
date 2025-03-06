@@ -31,7 +31,7 @@ params_dict = {
         'slice_bounds': (0, -210),
         'capture_rate': 240,
         'playback_rate': 60,
-        'focal_length': 24 * 10 ** -3,
+        'focal_length': 24E-3,
         'resolution': (720, 1280),
         'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
         'z_distance': 0.826
@@ -46,7 +46,7 @@ params_dict = {
         'slice_bounds': (200, -10),
         'capture_rate': 240,
         'playback_rate': 60,
-        'focal_length': 24 * 10 ** -3,
+        'focal_length': 24E-3,
         'resolution': (720, 1280),
         'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
         'z_distance': 0.826
@@ -61,7 +61,7 @@ params_dict = {
         'slice_bounds': (0, -220),
         'capture_rate': 240,
         'playback_rate': 60,
-        'focal_length': 24 * 10 ** -3,
+        'focal_length': 24E-3,
         'resolution': (720, 1280),
         'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
         'z_distance': 0.709
@@ -76,7 +76,7 @@ params_dict = {
         'slice_bounds': (0, -90),
         'capture_rate': 240,
         'playback_rate': 60,
-        'focal_length': 24 * 10 ** -3,
+        'focal_length': 24E-3,
         'resolution': (720, 1280),
         'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
         'z_distance': 0.709
@@ -91,7 +91,7 @@ params_dict = {
         'slice_bounds': (0, -310),
         'capture_rate': 240,
         'playback_rate': 60,
-        'focal_length': 24 * 10 ** -3,
+        'focal_length': 24E-3,
         'resolution': (720, 1280),
         'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
         'z_distance': 0.725
@@ -106,7 +106,7 @@ params_dict = {
         'slice_bounds': (0, -250),
         'capture_rate': 240,
         'playback_rate': 60,
-        'focal_length': 24 * 10 ** -3,
+        'focal_length': 24E-3,
         'resolution': (720, 1280),
         'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
         'z_distance': 0.725
@@ -123,7 +123,7 @@ params_dict = {
         'slice_bounds': (0, -250),
         'capture_rate': 240,
         'playback_rate': 60,
-        'focal_length': 24 * 10 ** -3,
+        'focal_length': 24E-3,
         'resolution': (720, 1280),
         'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
         'z_distance': 0.725
@@ -140,7 +140,7 @@ params_dict = {
         'slice_bounds': (0, -250),
         'capture_rate': 240,
         'playback_rate': 60,
-        'focal_length': 24 * 10 ** -3,
+        'focal_length': 24E-3,
         'resolution': (720, 1280),
         'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
         'z_distance': 0.725/2 # < --- FIGURE THIS OUT TODO

@@ -140,13 +140,13 @@ def compound_pendulum(p):
     return radius_centre_of_mass, radius_centre_of_mass_standard_deviation, moment_of_inertia, moment_of_inertia_standard_deviation
 
 
-def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,  do_plot=False):
+def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2,  do_plot=False):
 
     # ----------- PRE-PROCESSING  -----------
     time, x, _ = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig").T
-    time = time[cut::] * (parameters['playback_rate']/parameters['capture_rate'])
+    time = time[parameters['slice_bounds'][0]:parameters['slice_bounds'][1]] * (parameters['playback_rate']/parameters['capture_rate'])
+    x = x[parameters['slice_bounds'][0]:parameters['slice_bounds'][1]]  # -- get the data and trim it
     time = time - np.min(time)
-    x = x[cut::]  # -- get the data and trim it
 
     x = np.arctan(x / parameters['focal_length'])  # focalLength (px) = focalLength (mm) * width (px) / width (mm)
 

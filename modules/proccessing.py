@@ -7,7 +7,7 @@ from modules.Enums import Experiment
 
 # ------ SETUP ---------
 fileNames = os.listdir('../data/')
-REGEX_PATTERN = r"^_o7_.+\.csv$"
+REGEX_PATTERN = r"^raw__.+\.csv$"
 g = []
 DO_PLOT = False
 # ---PARAMETER CONFIG---
@@ -119,6 +119,14 @@ params_dict = {
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
+
+        'slice_bounds': (0, -250),
+        'capture_rate': 240,
+        'playback_rate': 60,
+        'focal_length': 24 * 10 ** -3,
+        'resolution': (720, 1280),
+        'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
+        'z_distance': 0.725
     },
     'MetalRod_2': {
         'rod_length': (1, 0.5E-3),
@@ -128,6 +136,14 @@ params_dict = {
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
+
+        'slice_bounds': (0, -250),
+        'capture_rate': 240,
+        'playback_rate': 60,
+        'focal_length': 24 * 10 ** -3,
+        'resolution': (720, 1280),
+        'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
+        'z_distance': 0.725/2 # < --- FIGURE THIS OUT TODO
     }
 }
 
@@ -140,7 +156,7 @@ for filename in fileNames:
     if re.match(REGEX_PATTERN, filename):
         filename = filename.replace('.csv', '')
         g.append(fitting_dataset(filename,
-                                 params_dict[f'{filename.replace('_o7_', '')}'],
+                                 params_dict[f"{filename.replace('raw__', '')}"],
                                  0.05,
                                  np.pi / 2,
                                  do_plot=DO_PLOT))

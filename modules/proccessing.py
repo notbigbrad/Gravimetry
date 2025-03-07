@@ -2,14 +2,14 @@ import os
 import re
 import numpy as np
 from modules.fitter import fitting_dataset, fitting_g
-from modules.Enums import Experiment
+from modules.Enums_and_constants import Experiment
 
 
 # ------ SETUP ---------
 fileNames = os.listdir('../data/')
 REGEX_PATTERN = r"^raw__.+\.csv$"
 g = {}
-DO_PLOT = False
+DO_PLOT = True
 # ---PARAMETER CONFIG---
 
 # sets 1,2 performed on 23/02/25
@@ -120,13 +120,7 @@ params_dict = {
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
 
-        'slice_bounds': (0, -250),
-        'capture_rate': 240,
-        'playback_rate': 60,
-        'focal_length': 24E-3,
-        'resolution': (720, 1280),
-        'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
-        'z_distance': 0.725
+    #     TODO come back to this
     },
     'MetalRod_2': {
         'rod_length': (1, 0.5E-3),
@@ -137,13 +131,7 @@ params_dict = {
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
 
-        'slice_bounds': (0, -250),
-        'capture_rate': 240,
-        'playback_rate': 60,
-        'focal_length': 24E-3,
-        'resolution': (720, 1280),
-        'pixel_size': tuple(np.array([7.3, 9.8]) / [720, 1280]),
-        'z_distance': 0.725/2 # < --- FIGURE THIS OUT TODO
+    #     TODO come back to this
     }
 }
 
@@ -156,7 +144,7 @@ for filename in fileNames:
     if re.match(REGEX_PATTERN, filename):
         filename = filename.replace('.csv', '')
         g[f"{filename.replace('raw__', '')}"] = (
-            fitting_dataset(filename, params_dict[f"{filename.replace('raw__', '')}"],0.05, np.pi / 2, do_plot=DO_PLOT))
+            fitting_dataset(filename, params_dict[f"{filename.replace('raw__', '')}"],do_plot=DO_PLOT))
 
 # ---- FINAL FIT ----
 fitting_g(g)

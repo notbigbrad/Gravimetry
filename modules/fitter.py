@@ -1,13 +1,80 @@
+from time import time_ns
+
 import numpy as np
 import scipy.optimize
+
 from modules.camera_processing import true_position, angle
 from modules.error_propagation import evaluation_with_error, sp
-from modules.modelling import under_damped_pendulum as model, linear_function
-from modules.Enums import Experiment, Dependence
+from modules.modelling import simple_under_damped_pendulum_solution, linear_function, ode_callable_über_wrapper
+from modules.Enums_and_constants import Experiment, Dependence
 from modules.plotter import plot_now, do_plot_go
 
+def simple_solution_fitting(time, subtended_angle, effective_length):
 
-def double_string_pendulum(p):
+    bounds = [[0.0001, 0.0001, 0.1, -np.pi], [0.04, 1, 10, np.pi]]
+
+    simple_optimal, simple_covariance_matrix = scipy.optimize.curve_fit(
+        simple_under_damped_pendulum_solution,
+        time,
+        subtended_angle,
+        p0=[0.03, 0.1, np.sqrt(9.81 / effective_length), np.pi / 4],  # <-- initial guesses : A0, gamma, omega, phi
+        bounds=bounds,
+        absolute_sigma=False,
+        maxfev=1E9
+    )
+
+    # gamma = simple_optimal[1]
+    # omega = simple_optimal[2]
+
+    time_space = np.linspace(np.min(time), np.max(time), len(time))
+    simple_residuals = subtended_angle - simple_under_damped_pendulum_solution(
+        time_space,
+        simple_optimal[0],
+        simple_optimal[1],
+        simple_optimal[2],
+        simple_optimal[3]   # Residuals
+    )
+
+    return simple_optimal, simple_covariance_matrix, simple_residuals
+
+def ode_solution_fitting(time, subtended_angle, I, m, r_o, ϕ):
+
+    θ_initial = np.pi / 4
+    ω_initial = 0
+
+    bounds = [[0,0],[2,10]]
+
+    ode_optimal, ode_covariance_matrix = scipy.optimize.curve_fit(
+        lambda t, b, g: ode_callable_über_wrapper(t, b, g,
+                                                  I_given=I,
+                                                  m_given=m,
+                                                  r_o_given=r_o,
+                                                  ϕ_given=ϕ,
+                                                  θ_initial=θ_initial,
+                                                  ω_initial=ω_initial),
+        time,
+        subtended_angle,
+        p0=[0.5, 9.81] ,     # < --- initial guesses : b, g
+        bounds=bounds
+    )
+
+    time_space = np.linspace(np.min(time), np.max(time), len(time))
+    ode_residuals = subtended_angle - ode_callable_über_wrapper(time_space, ode_optimal[0], ode_optimal[1],
+                                                  I_given=I,
+                                                  m_given=m,
+                                                  r_o_given=r_o,
+                                                  ϕ_given=ϕ,
+                                                  θ_initial=θ_initial,
+                                                  ω_initial=ω_initial)
+
+    return ode_optimal, ode_covariance_matrix, ode_residuals
+
+def double_string_pendulum(p, filename, do_plot=False):
+
+    # ----------- PRE-PROCESSING  -----------
+
+    time, raw_x, raw_y = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig")[p['slice_bounds'][0]:p['slice_bounds'][1]].T
+    time = np.linspace(0, max(time) - min(time), len(time)) / (p['capture_rate'] / p['playback_rate'])
 
     if isinstance(p['hypotenuse'][0], list):
         p['hypotenuse'][1] = np.std(p['hypotenuse'][0] / np.sqrt(len(p['hypotenuse'][0])))
@@ -16,6 +83,13 @@ def double_string_pendulum(p):
     if isinstance(p['horizontal'][0], list):
         p['horizontal'][1] = np.std(p['horizontal'][0] / np.sqrt(len(p['horizontal'][0])))
         p['horizontal'][0] = np.mean(p['horizontal'][0])
+
+    x, y = true_position(raw_x, raw_y, pixel_size=p['pixel_size'], resolution=p['resolution'], focal_length=p['focal_length'], z_distance=p['z_distance'])
+
+    position_data = [time, x, y]
+    zero_point = np.mean(x)
+
+    # ----------- SIMPLE PENDULUM PARAMETER BUILDER  -----------
 
     h, d, d_b = sp.symbols('h d d_b')
     expr_length = sp.sqrt(h ** 2 - (d / 2) ** 2) + (d_b/2)
@@ -29,8 +103,53 @@ def double_string_pendulum(p):
 
     effective_length_standard_deviation = np.sqrt(effective_length_variance)
 
-    return effective_length, effective_length_standard_deviation
+    pivot = [np.mean(x), np.mean(y + effective_length)]
+    subtended_angle = angle([x, y], pivot)
 
+    # ----------- ODE PARAMETER BUILDER -----------
+
+    radius_centre_of_mass, radius_centre_of_mass_standard_deviation = effective_length, effective_length_standard_deviation
+
+    m_b, d_b, r_o = sp.symbols('m_b d_b r_o')
+    expr_moment_of_inertia = (2/5 * m_b * (d_b/2)**2) + (m_b * r_o**2)
+
+    moment_of_inertia, moment_of_inertia_variance = evaluation_with_error(
+        my_function=expr_moment_of_inertia,
+        ball_mass=[p['ball_mass'],Dependence.INDEPENDENT, m_b],
+        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
+        radius_centre_of_mass=[[radius_centre_of_mass, radius_centre_of_mass_standard_deviation],Dependence.INDEPENDENT, r_o]
+    )
+
+    moment_of_inertia_standard_deviation = np.sqrt(moment_of_inertia_variance)
+
+    # ----------- FITTING & RESIDUALS -----------
+
+        # 1. ---------- Simple Solution Fitter -----------
+
+    simple_parameters, simple_covariance_matrix, simple_residuals = simple_solution_fitting(
+        time,
+        subtended_angle,
+        effective_length
+    )
+
+    # 2. ---------- Coupled ODE Solution Fitter -----------
+
+    ode_parameters, ode_covariance_matrix, ode_residuals = ode_solution_fitting(
+        time,
+        subtended_angle,
+        moment_of_inertia,
+        p['ball_mass'][0],
+        radius_centre_of_mass,
+        0
+    )
+
+    # ----------- PLOTTING (OPTIONAL) -----------
+
+    if do_plot:
+        do_plot_go(filename, time, subtended_angle, simple_parameters, effective_length, simple_residuals,
+                   simple_under_damped_pendulum_solution)
+
+    print('stop')
 
 def compound_pendulum(p):
 
@@ -111,23 +230,13 @@ def compound_pendulum(p):
     return radius_centre_of_mass, radius_centre_of_mass_standard_deviation, moment_of_inertia, moment_of_inertia_standard_deviation
 
 
-def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi / 2, cut=500,  do_plot=False):
-
-    # ----------- PRE-PROCESSING  -----------
-    time, raw_x, raw_y = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig")[parameters['slice_bounds'][0]:parameters['slice_bounds'][1]].T
-    time = np.linspace(0, max(time) - min(time), len(time)) / (parameters['capture_rate'] / parameters['playback_rate'])
-
-    if 'z_distance' in parameters.keys():
-        x, y = true_position(raw_x, raw_y, pixel_size=parameters['pixel_size'], resolution=parameters['resolution'], focal_length=parameters['focal_length'], z_distance=parameters['z_distance'])
-
-        position_data = [time, x, y]
-        zero_point = np.mean(x)
+def fitting_dataset(filename, parameters, do_plot=False):
 
 
     #----------- METHODOLOGY PROCESSING -----------
 
     if parameters['method'] == Experiment.DOUBLE_STRING:
-        vertical_length, vertical_length_standard_deviation = double_string_pendulum(parameters)
+        vertical_length, vertical_length_standard_deviation = double_string_pendulum(parameters, filename, do_plot)
 
 
 
@@ -137,8 +246,7 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
     else:
         quit()
 
-    pivot = [np.mean(x), np.mean(y + vertical_length)]
-    subtended_angle = angle([x, y], pivot)
+
 
     bounds = [[0.0001,0.0001,0.1,-np.pi],[0.04,1,10,np.pi]]
     initial_guess = [0.03, 0.1, np.sqrt(9.81 / vertical_length), np.pi/4] # A0, gamma, omega, phi
@@ -148,16 +256,16 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 
     #----------- FITTING & RESIDUALS -----------
     optimal, covariance_matrix = (scipy.optimize.curve_fit
-                           (model, time, subtended_angle,
+                           (simple_under_damped_pendulum_solution, time, subtended_angle,
                             p0=initial_guess, bounds=bounds, sigma=tracking_error,
                             absolute_sigma=True, maxfev=1*10**9))
 
     space = np.linspace(np.min(time), np.max(time), len(time))
-    r = x - model(space, optimal[0], optimal[1], optimal[2], optimal[3])     # Residuals
+    r = x - simple_under_damped_pendulum_solution(space, optimal[0], optimal[1], optimal[2], optimal[3])     # Residuals
 
     #----------- PLOTTING (OPTIONAL) -----------
     if do_plot:
-        do_plot_go(filename, time, x, tracking_error, optimal, vertical_length, r, model)
+        do_plot_go(filename, time, x, tracking_error, optimal, vertical_length, r, simple_under_damped_pendulum_solution)
 
     # ----------- PARAMETER EXTRACTION FOR G -----------
 

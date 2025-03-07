@@ -7,3 +7,6 @@ class Experiment(Enum):
 class Dependence(Enum):
     INDEPENDENT = 0
     COVARIANT = 1
+
+class Constant(Enum):
+    TRACKING_ERROR = 0.05

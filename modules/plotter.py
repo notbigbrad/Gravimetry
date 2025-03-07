@@ -1,4 +1,4 @@
-from modules.modelling import under_damped_pendulum as physical_pendulum, sin, linear_function
+from modules.modelling import simple_under_damped_pendulum_solution as physical_pendulum, sin, linear_function
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -28,7 +28,7 @@ def plot_now(x, z, f, g_dict, fitted_g, g_standard_deviation, g_standard_error):
     plt.legend()
     plt.show()
 
-def do_plot_go(filename, time, x, trackingErr, optimal, l, r, model):
+def do_plot_go(filename, time, x, optimal, l, r, model):
 
     tSpace = np.linspace(np.min(time), np.max(time), 10000)
     plt.figure(figsize=[15, 10])
@@ -36,10 +36,10 @@ def do_plot_go(filename, time, x, trackingErr, optimal, l, r, model):
     plt.axis("off")
     plt.subplot(211)
     plt.suptitle("Data Plot with Fitted Model")
-    plt.fill_between(time, x - trackingErr, x + trackingErr, color="lightgray")
+    plt.fill_between(time, x - 0.00872665, x + 0.00872665, color="lightgray") # <--- using half a degree as error, might revise later
     plt.scatter(time, x, color="red", marker="+", linewidths=1, label="Data")
     plt.plot(tSpace, model(tSpace, optimal[0], optimal[1], optimal[2], optimal[3]), label="Mathematical Pendulum Model")
-    plt.plot(tSpace, sin(tSpace, np.sqrt(9.81 / l), 0), "g--", label="Theoretical")
+    plt.plot(tSpace, sin(tSpace, np.sqrt(9.81 / l), 0, optimal[0]), "g--", label="Theoretical")
     plt.legend()
     plt.subplot(212)
     plt.suptitle("Residual Plot")

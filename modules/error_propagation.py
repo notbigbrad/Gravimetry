@@ -1,10 +1,9 @@
 import numpy as np
 import sympy as sp
-from modules.Enums import Experiment, Dependence
+from modules.Enums_and_constants import Experiment, Dependence
 
 
 def evaluation_with_error(my_function, covariance_matrix=None, **kwargs):
-
 
     input_values = {val[2]: val[0][0] for key, val in kwargs.items()}
     covariant_evaluated_partial_derivatives = []

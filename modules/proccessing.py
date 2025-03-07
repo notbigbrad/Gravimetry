@@ -8,7 +8,7 @@ from modules.Enums import Experiment
 # ------ SETUP ---------
 fileNames = os.listdir('../data/')
 REGEX_PATTERN = r"^raw__.+\.csv$"
-g = []
+g = {}
 DO_PLOT = False
 # ---PARAMETER CONFIG---
 
@@ -155,11 +155,8 @@ params_dict = {
 for filename in fileNames:
     if re.match(REGEX_PATTERN, filename):
         filename = filename.replace('.csv', '')
-        g.append(fitting_dataset(filename,
-                                 params_dict[f"{filename.replace('raw__', '')}"],
-                                 0.05,
-                                 np.pi / 2,
-                                 do_plot=DO_PLOT))
+        g[f"{filename.replace('raw__', '')}"] = (
+            fitting_dataset(filename, params_dict[f"{filename.replace('raw__', '')}"],0.05, np.pi / 2, do_plot=DO_PLOT))
 
 # ---- FINAL FIT ----
 fitting_g(g)

@@ -10,11 +10,11 @@ from modules.plotter import plot_now, do_plot_go
 def double_string_pendulum(p):
 
     if isinstance(p['hypotenuse'][0], list):
-        p['hypotenuse'][1] = np.std(p['hypotenuse'][0])
+        p['hypotenuse'][1] = np.std(p['hypotenuse'][0] / np.sqrt(len(p['hypotenuse'][0])))
         p['hypotenuse'][0] = np.mean(p['hypotenuse'][0])
 
     if isinstance(p['horizontal'][0], list):
-        p['horizontal'][1] = np.std(p['horizontal'][0])
+        p['horizontal'][1] = np.std(p['horizontal'][0] / np.sqrt(len(p['horizontal'][0])))
         p['horizontal'][0] = np.mean(p['horizontal'][0])
 
     h, d, d_b = sp.symbols('h d d_b')
@@ -214,9 +214,8 @@ def fitting_dataset(filename, parameters, tracking_error=0.05, phase_guess=np.pi
 def fitting_g(g):
     x = np.linspace(0, len(g) - 1, len(g))
     z = np.linspace(0, len(g) - 1, 1000)
-    g = np.array(g)
-
-    optimal, covariance = scipy.optimize.curve_fit(linear_function, x, g.T[0], p0=[9.81], sigma=g.T[1],
+    g_input = np.array([elt for elt in g.values()])
+    optimal, covariance = scipy.optimize.curve_fit(linear_function, x, g_input.T[0], p0=[9.81], sigma=g_input.T[1],
                                                    absolute_sigma=True, maxfev=1 * 10 ** 9)
     fitted_g = optimal[0]
     g_standard_deviation = np.sqrt(np.diag(covariance))[0]

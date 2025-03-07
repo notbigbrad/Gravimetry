@@ -2,7 +2,19 @@ from modules.modelling import under_damped_pendulum as physical_pendulum, sin, l
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_now(x, z, f, g, fitted_g, g_standard_deviation, g_standard_error):
+def plot_now(x, z, f, g_dict, fitted_g, g_standard_deviation, g_standard_error):
+    g = np.array([
+        # g_dict['MetalRod_1'],
+        g_dict['DoublePendulum1m_1'],
+        g_dict['DoublePendulum1m_2'],
+        g_dict['DoublePendulum1.5m_1'],
+        g_dict['DoublePendulum1.5m_2'],
+        g_dict['DoublePendulum2m_1'],
+        g_dict['DoublePendulum2m_2']
+    ])
+
+
+
     plt.figure(figsize=[10, 5])
     plt.suptitle(f'g: {fitted_g} +- {g_standard_error} ms^-2')
     plt.title(f'Measured values for g')
@@ -17,6 +29,7 @@ def plot_now(x, z, f, g, fitted_g, g_standard_deviation, g_standard_error):
     plt.show()
 
 def do_plot_go(filename, time, x, trackingErr, optimal, l, r, model):
+
     tSpace = np.linspace(np.min(time), np.max(time), 10000)
     plt.figure(figsize=[15, 10])
     plt.title(filename)

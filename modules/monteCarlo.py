@@ -1,31 +1,34 @@
 import numpy as np
 import scipy
+import os
 from modules.model import *
 from joblib import Parallel, delayed
 from datetime import datetime as dt
 
-def optimize_curve(i, arrays, time, data, p0, bounds):
-    optimal, covariance = scipy.optimize.curve_fit(lambda t, thet0, om0, g, b: physicalODE(t, thet0, om0, g, b, m=arrays[i][0], r=arrays[i][1], I=arrays[i][2]), time, data, p0=p0, bounds=bounds)
-    print(optimal[2], end='\r', flush=True)
-    return optimal[2], np.sqrt(covariance[2, 2])
+def prop(func, time, data, bounds, p0, constants, constantStd, n=1e4, **kwargs):
 
-def prop(func, time, data, bounds, p0, constants, constantStd):
-    
+    def ODE_wrapper(i, arrays):
+        optimal, covariance = scipy.optimize.curve_fit(lambda t, *fittedParams: func(t, *fittedParams, m=arrays[i][0], r=arrays[i][1], I=arrays[i][2]), time, data, p0=p0, bounds=bounds)
+        print(optimal[2], end='\r', flush=True)
+        return optimal[2], np.sqrt(covariance[2, 2])
+        
     print(f'Started {dt.now()}')
-    n = int(1e4)
     
-    arrays = []
+    n = int(n)
+    
+    noise = []
     
     for i in range(len(constants)):
-        arrays.append(np.random.normal(constants[i], constantStd[i], n))
+        noise.append(np.random.normal(constants[i], constantStd[i], n))
     
-    arrays = np.array(arrays).T
+    noise = np.array(noise).T
     
     results = []
     errors = []
 
-    results, errors = zip(*Parallel(n_jobs=24)(
-    delayed(optimize_curve)(i, arrays, time, data, p0, bounds) for i in range(len(arrays))
+    results, errors = zip(*Parallel(n_jobs=(os.process_cpu_count()-1))(
+        # delayed(ODE_wrapper)(i, noise, time, data, p0, bounds) for i in range(len(noise))
+        delayed(ODE_wrapper)(i, noise) for i in range(len(noise))
     ))
         
     # Collate all data

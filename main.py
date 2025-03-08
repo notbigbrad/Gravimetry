@@ -202,7 +202,7 @@ for i in range(len(angularData)):
     # Bounds
     bounds1 = [[0.0001,0.0001,0.1,-np.pi],[0.04,1,10,np.pi]] # bounds on the fitting function MATH
     bounds2 = [[-np.pi,0,7,0.00001],[np.pi,5,12,0.1]] # bounds on the fitting function ODE
-
+    
     # Fit model
     optimal1, covariance1 = scipy.optimize.curve_fit(physicalPendulum, time, theta, p0=I1, bounds=bounds1, maxfev=1*10**9)
     optimal2, covariance2 = scipy.optimize.curve_fit(lambda t, thet0, om0, g, b : physicalODE(t, thet0, om0, g, b, m=m, r=r0[i], I=I0[i]), time, theta, p0=I2, bounds=bounds2, maxfev=1*10**9)

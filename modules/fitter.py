@@ -2,7 +2,7 @@ from time import time_ns
 
 import numpy as np
 import scipy.optimize
-
+import matplotlib.pyplot as plt
 from modules.camera_processing import true_position, angle
 from modules.error_propagation import evaluation_with_error, sp
 from modules.modelling import simple_under_damped_pendulum_solution, linear_function, ode_callable_über_wrapper
@@ -42,30 +42,34 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o, ϕ):
     θ_initial = np.pi / 4
     ω_initial = 0
 
-    bounds = [[0,0],[2,10]]
+    bounds = [[-np.pi,0,0,9],[np.pi,4,2,10]]
 
     ode_optimal, ode_covariance_matrix = scipy.optimize.curve_fit(
-        lambda t, b, g: ode_callable_über_wrapper(t, b, g,
-                                                  I_given=I,
-                                                  m_given=m,
-                                                  r_o_given=r_o,
-                                                  ϕ_given=ϕ,
-                                                  θ_initial=θ_initial,
-                                                  ω_initial=ω_initial),
+        lambda t, θ_initial, ω_initial, b, g: ode_callable_über_wrapper(
+        t, θ_initial, ω_initial, b, g,
+        I_given=I,
+        m_given=m,
+        r_o_given=r_o,
+        ϕ_given=ϕ,
+        ),
         time,
         subtended_angle,
-        p0=[0.5, 9.81] ,     # < --- initial guesses : b, g
+        p0=[θ_initial, ω_initial, 0.001, 9.816] ,     # < --- initial guesses : θ_initial, ω_initial, b, g
         bounds=bounds
     )
 
     time_space = np.linspace(np.min(time), np.max(time), len(time))
-    ode_residuals = subtended_angle - ode_callable_über_wrapper(time_space, ode_optimal[0], ode_optimal[1],
-                                                  I_given=I,
-                                                  m_given=m,
-                                                  r_o_given=r_o,
-                                                  ϕ_given=ϕ,
-                                                  θ_initial=θ_initial,
-                                                  ω_initial=ω_initial)
+    ode_residuals = subtended_angle - ode_callable_über_wrapper(
+        time_space,
+        ode_optimal[0],
+        ode_optimal[1],
+        ode_optimal[2],
+        ode_optimal[3],
+        I_given=I,
+        m_given=m,
+        r_o_given=r_o,
+        ϕ_given=ϕ
+    )
 
     return ode_optimal, ode_covariance_matrix, ode_residuals
 

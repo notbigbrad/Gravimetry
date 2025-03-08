@@ -27,15 +27,9 @@ def prop(func, time, data, bounds, p0, constants, constantStd, n=1e4, **kwargs):
     errors = []
 
     results, errors = zip(*Parallel(n_jobs=(os.process_cpu_count()-1))(
-        # delayed(ODE_wrapper)(i, noise, time, data, p0, bounds) for i in range(len(noise))
         delayed(ODE_wrapper)(i, noise) for i in range(len(noise))
     ))
-        
-    # Collate all data
-    final = [np.mean(results), scipy.stats.sem(results)]
-        
-    # optimal, covariance = scipy.optimize.curve_fit(f, tSpace, results, sigma=errors, absolute_sigma=True, maxfev=1*10**9)
     
     print(f'Done {dt.now()}')
     
-    return results, errors, final
+    return results, errors, [np.mean(results), scipy.stats.sem(results)]

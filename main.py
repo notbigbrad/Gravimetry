@@ -9,7 +9,6 @@ from modules.error_and_evalutation import evaluation_with_error
 from modules.position import *
 from modules.model import *
 from modules.error import *
-from modules.errorProp import *
 from datetime import datetime as dt
 import re
 plt.show = lambda : 0 # dissable plot output

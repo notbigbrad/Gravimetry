@@ -15,8 +15,10 @@ def truePos(coord, pixelSize, resolution, f, z):
         # Convert pixel index to distance
         x, y = (p*pixelSize - centre)
 
-        truex.append(-((x * f)/(z - f)))
-        truey.append(-((y * f)/(z - f)))
+        # truex.append(-((x * f)/(z - f)))
+        # truey.append(-((y * f)/(z - f)))
+        truex.append(x - (z*x)/(f))
+        truey.append(y - (z*y)/(f))
 
     return truex, truey
 

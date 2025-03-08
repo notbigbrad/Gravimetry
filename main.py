@@ -1,4 +1,5 @@
 import os
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
@@ -9,7 +10,28 @@ from modules.position import *
 from modules.model import *
 from modules.error import *
 from modules.errorProp import *
-# plt.show = lambda : 0 # dissable plot output
+from datetime import datetime as dt
+import re
+plt.show = lambda : 0 # dissable plot output
+
+# ============================================================================= Logging
+
+class DualStream:
+    def __init__(self):
+        fName = re.sub(r'[<>:"/\\|?*]', '-', dt.now().strftime('%Y-%m-%d %H;%M;%S.%f'))
+        print(f'Printing log to: {fName}')
+        self.file = open(f'./logs/{fName}.txt', 'w')
+        self.console = sys.stdout
+
+    def write(self, message):
+        self.console.write(message)
+        self.file.write(message)
+
+    def flush(self):
+        self.console.flush()
+        self.file.flush()
+
+sys.stdout = DualStream()
 
 # ============================================================================= Perfrom pre-processing
 
@@ -184,7 +206,7 @@ for i in range(len(angularData)):
     # Fit model
     optimal1, covariance1 = scipy.optimize.curve_fit(physicalPendulum, time, theta, p0=I1, bounds=bounds1, maxfev=1*10**9)
     optimal2, covariance2 = scipy.optimize.curve_fit(lambda t, thet0, om0, g, b : physicalODE(t, thet0, om0, g, b, m=m, r=r0[i], I=I0[i]), time, theta, p0=I2, bounds=bounds2, maxfev=1*10**9)
-    Monteoptimal, Montecovariance = monteCarlo.prop(physicalODE, time, theta, bounds2, I2, (m, r0[i], I0[i]), (mStd, r0Std[i], I0Std[i]))
+    results, errors, final = monteCarlo.prop(physicalODE, time, theta, bounds2, I2, (m, r0[i], I0[i]), (mStd, r0Std[i], I0Std[i]))
 
     o = optimal1[2]
     oStd = np.sqrt(covariance1[2,2])
@@ -208,8 +230,8 @@ for i in range(len(angularData)):
     gODE.append(optimal2[2])
     gStdODE.append(np.sqrt(covariance2[2,2]))
     
-    gMonte.append(Monteoptimal[0])
-    gStdMonte.append(np.sqrt(Montecovariance[0,0]))
+    gMonte.append(final[0])
+    gStdMonte.append(final[1])
 
     print(f'g: {g[i]:.5f} +- {gStd[i]:.5f} ms^-2 (math)')
     print(f'g: {gODE[i]:.5f} +- {gStdODE[i]:.5f} ms^-2 (phys)')
@@ -245,6 +267,11 @@ for i in range(len(angularData)):
     plt.subplot(325)
     plt.title("Residual (Math-Phys)")
     plt.plot(r1-r2, color="black")
+    plt.subplot(326)
+    plt.title("Monte Carlo")
+    plt.errorbar(np.linspace(np.min(results),np.max(results),len(results)), results, yerr=errors, color="red")
+    plt.plot(np.linspace(np.min(results),np.max(results),len(results)), f(np.linspace(np.min(results),np.max(results),len(results)), final[0]))
+    plt.show()
     plt.show()
 
 # ============================================================================= Propogate errors and find final value

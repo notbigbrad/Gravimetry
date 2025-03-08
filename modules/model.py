@@ -28,7 +28,11 @@ def physicalODE(t, thet0, om0, g, b, m, r, I):
     # sol.y[0], sol.y[1] = angle, angular velocity
     return sol.y[0]
 
+# def ode_system(t, y, b, m, g, r, I):
+#     y1, y2 = y
+#     dydt = [y2, - (b / I) * y2 - ((m * g * r) / I) * np.sin(y1)]
+#     return dydt
 def ode_system(t, y, b, m, g, r, I):
     y1, y2 = y
-    dydt = [y2, - (b / I) * y2 - ((m * g * r) / I) * np.sin(y1)]
+    dydt = [y2, - (b / I) * y2 - np.sqrt(((m * g * r) / I)**2-(b/2*m)**2) * np.sin(y1)]
     return dydt

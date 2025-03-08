@@ -1,15 +1,8 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy
-import sympy as sp
-from modules.error_and_evalutation import evaluation_with_error
-from modules.position import *
 from modules.model import *
-from modules.error import *
-from modules.errorProp import *
 from joblib import Parallel, delayed
 from datetime import datetime as dt
-# plt.show = lambda : 0 # dissable plot output
 
 def optimize_curve(i, arrays, time, data, p0, bounds):
     optimal, covariance = scipy.optimize.curve_fit(lambda t, thet0, om0, g, b: physicalODE(t, thet0, om0, g, b, m=arrays[i][0], r=arrays[i][1], I=arrays[i][2]), time, data, p0=p0, bounds=bounds)
@@ -19,7 +12,7 @@ def optimize_curve(i, arrays, time, data, p0, bounds):
 def prop(func, time, data, bounds, p0, constants, constantStd):
     
     print(f'Started {dt.now()}')
-    n = int(1e6)
+    n = int(1e4)
     
     arrays = []
     
@@ -31,22 +24,15 @@ def prop(func, time, data, bounds, p0, constants, constantStd):
     results = []
     errors = []
 
-    results, errors = zip(*Parallel(n_jobs=22)(
+    results, errors = zip(*Parallel(n_jobs=24)(
     delayed(optimize_curve)(i, arrays, time, data, p0, bounds) for i in range(len(arrays))
     ))
         
     # Collate all data
-    tSpace = np.linspace(np.min(results),np.max(results),len(results))
+    final = [np.mean(results), scipy.stats.sem(results)]
         
-    optimal, covariance = scipy.optimize.curve_fit(f, tSpace, results, sigma=errors, absolute_sigma=True, maxfev=1*10**9)    
+    # optimal, covariance = scipy.optimize.curve_fit(f, tSpace, results, sigma=errors, absolute_sigma=True, maxfev=1*10**9)
     
     print(f'Done {dt.now()}')
     
-    # Plot output
-    plt.figure(figsize=[14,7])
-    plt.title("Monte Carlo")
-    plt.errorbar(tSpace, results, yerr=errors, color="red")
-    plt.plot(tSpace, f(tSpace, optimal[0]))
-    plt.show()
-    
-    return optimal, covariance
+    return results, errors, final

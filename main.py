@@ -272,7 +272,6 @@ for i in range(len(angularData)):
     plt.errorbar(np.linspace(np.min(results),np.max(results),len(results)), results, yerr=errors, color="red")
     plt.plot(np.linspace(np.min(results),np.max(results),len(results)), f(np.linspace(np.min(results),np.max(results),len(results)), final[0]))
     plt.show()
-    plt.show()
 
 # ============================================================================= Propogate errors and find final value
 

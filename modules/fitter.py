@@ -37,7 +37,7 @@ def simple_solution_fitting(time, subtended_angle, effective_length):
 
     return simple_optimal, simple_covariance_matrix, simple_residuals
 
-def ode_solution_fitting(time, subtended_angle, I, m, r_o, ϕ):
+def ode_solution_fitting(time, subtended_angle, I, m, r_o):
 
     θ_initial = np.pi / 4
     ω_initial = 0
@@ -45,18 +45,20 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o, ϕ):
     bounds = [[-np.pi,0,0,9],[np.pi,4,2,10]]
 
     ode_optimal, ode_covariance_matrix = scipy.optimize.curve_fit(
-        lambda t, θ_initial, ω_initial, b, g: ode_callable_über_wrapper(
-        t, θ_initial, ω_initial, b, g,
+        lambda t, θ_initial, ω, b, g: ode_callable_über_wrapper(
+        t, θ_initial, ω, b, g,
         I_given=I,
         m_given=m,
         r_o_given=r_o,
-        ϕ_given=ϕ,
         ),
         time,
         subtended_angle,
         p0=[θ_initial, ω_initial, 0.001, 9.816] ,     # < --- initial guesses : θ_initial, ω_initial, b, g
         bounds=bounds
     )
+
+
+
 
     time_space = np.linspace(np.min(time), np.max(time), len(time))
     ode_residuals = subtended_angle - ode_callable_über_wrapper(
@@ -67,15 +69,14 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o, ϕ):
         ode_optimal[3],
         I_given=I,
         m_given=m,
-        r_o_given=r_o,
-        ϕ_given=ϕ
+        r_o_given=r_o
     )
 
     return ode_optimal, ode_covariance_matrix, ode_residuals
 
 def double_string_pendulum(p, filename, do_plot=False):
 
-    # ----------- PRE-PROCESSING  -----------
+                        # ----------- PRE-PROCESSING  -----------
 
     time, raw_x, raw_y = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig")[p['slice_bounds'][0]:p['slice_bounds'][1]].T
     time = np.linspace(0, max(time) - min(time), len(time)) / (p['capture_rate'] / p['playback_rate'])
@@ -143,8 +144,7 @@ def double_string_pendulum(p, filename, do_plot=False):
         subtended_angle,
         moment_of_inertia,
         p['ball_mass'][0],
-        radius_centre_of_mass,
-        0
+        radius_centre_of_mass
     )
 
     # ----------- PLOTTING (OPTIONAL) -----------

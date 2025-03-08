@@ -7,10 +7,9 @@ from modules.position import *
 from modules.model import *
 from modules.error import *
 from modules.errorProp import *
-import concurrent.futures
 from joblib import Parallel, delayed
 from datetime import datetime as dt
-plt.show = lambda : 0 # dissable plot output
+# plt.show = lambda : 0 # dissable plot output
 
 def optimize_curve(i, arrays, time, data, p0, bounds):
     optimal, covariance = scipy.optimize.curve_fit(lambda t, thet0, om0, g, b: physicalODE(t, thet0, om0, g, b, m=arrays[i][0], r=arrays[i][1], I=arrays[i][2]), time, data, p0=p0, bounds=bounds)
@@ -31,22 +30,10 @@ def prop(func, time, data, bounds, p0, constants, constantStd):
     
     results = []
     errors = []
-    
-    # for i in range(len(arrays)):
-    #     optimal, covariance = scipy.optimize.curve_fit(lambda t, thet0, om0, g, b : func(t, thet0, om0, g, b, m=arrays[i][0], r=arrays[i][1], I=arrays[i][2]), time, data, p0=p0, bounds=bounds, maxfev=1*10**9)
-    #     results.append(optimal[2])
-    #     errors.append(np.sqrt(covariance[2,2]))
-    
+
     results, errors = zip(*Parallel(n_jobs=22)(
     delayed(optimize_curve)(i, arrays, time, data, p0, bounds) for i in range(len(arrays))
     ))
-    # with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
-    #     futures = [executor.submit(optimize_curve, i, arrays, time, data, p0, bounds) for i in range(len(arrays))]
-        
-    #     for future in concurrent.futures.as_completed(futures):
-    #         optimal_2, error_2 = future.result()
-    #         results.append(optimal_2)
-    #         errors.append(error_2)
         
     # Collate all data
     tSpace = np.linspace(np.min(results),np.max(results),len(results))

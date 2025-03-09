@@ -2,36 +2,43 @@ from modules.modelling import simple_under_damped_pendulum_solution as physical_
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_now(x, z, f, g_dict, fitted_g, g_standard_deviation, g_standard_error):
-    g = np.array([
-        # g_dict['MetalRod_1'],
-        g_dict['DoublePendulum1m_1']['simple'],
-        g_dict['DoublePendulum1m_1']['differential_equation'],
-        g_dict['DoublePendulum1m_2']['simple'],
-        g_dict['DoublePendulum1m_2']['differential_equation'],
-        g_dict['DoublePendulum1.5m_1']['simple'],
-        g_dict['DoublePendulum1.5m_1']['differential_equation'],
-        g_dict['DoublePendulum1.5m_2']['simple'],
-        g_dict['DoublePendulum1.5m_2']['differential_equation'],
-        g_dict['DoublePendulum2m_1']['simple'],
-        g_dict['DoublePendulum2m_1']['differential_equation'],
-        g_dict['DoublePendulum2m_2']['simple'],
-        g_dict['DoublePendulum2m_2']['differential_equation']
-    ])
 
+def plot_now(x, g_simple_values, g_differential_values, g_simple, g_diff_eq, g_err_simple, g_err_diff_eq, labels):
 
+    def get_sort_key(label):
+        parts = label.replace("DoublePendulum", "")
+        x_part, y_part = parts.split("m_")
+        return (float(x_part), int(y_part))
 
-    plt.figure(figsize=[10, 5])
-    plt.suptitle(f'g: {fitted_g} +- {g_standard_error} ms^-2')
-    plt.title(f'Measured values for g')
-    plt.ylabel(f'g (ms^-2)')
-    plt.fill_between(x, g.T[0] - g.T[1], g.T[0] + g.T[1], color="lightcoral", alpha=0.3)
-    plt.errorbar(x, g.T[0], yerr=g.T[1], color="red", marker="+", capsize=5, capthick=1, label="Data", linewidth=0,
-                 elinewidth=1)
-    plt.fill_between(z, f(z, fitted_g - g_standard_deviation), f(z, fitted_g + g_standard_deviation), color="lightskyblue", alpha=0.3)
-    plt.plot(z, f(z, fitted_g), label="Least Squares Fit")
-    plt.plot(z, f(z, 9.81616), linestyle="--", color="green", label="Theoretical Local g")
+    sorted_labels = sorted(labels, key=get_sort_key)
+
+    sorted_indices = [labels.index(label) for label in sorted_labels]
+
+    x_sorted = np.arange(len(sorted_labels))
+    g_simple_sorted = np.array(g_simple_values)[sorted_indices]
+    g_differential_sorted = np.array(g_differential_values)[sorted_indices]
+    labels_sorted = [labels[i] for i in sorted_indices]
+
+    plt.figure(figsize=(12, 6))
+    plt.suptitle('Measured values for g')
+    plt.ylabel('g (m/s²)')
+    plt.xlabel('Experiment')
+
+    plt.errorbar(x_sorted, g_simple_sorted[:, 0], yerr=g_simple_sorted[:, 1], fmt='o',
+                 label='Simple Model', color='red', capsize=5)
+    plt.errorbar(x_sorted, g_differential_sorted[:, 0], yerr=g_differential_sorted[:, 1], fmt='s',
+                 label='Differential Equation Model', color='blue', capsize=5)
+
+    plt.axhline(y=g_simple, color='red', linestyle='--',
+                label=f'Fit (Simple): {g_simple:.5f} ± {g_err_simple:.1g} m/s²')
+    plt.axhline(y=g_diff_eq, color='blue', linestyle='-.',
+                label=f'Fit (Diff Eq): {g_diff_eq:.5f} ± {g_err_diff_eq:.1g} m/s²')
+    plt.axhline(y=9.81616, color='green', linestyle='-', label='Theoretical Local g')
+
+    # Set x-axis ticks and labels
+    plt.xticks(x_sorted, labels_sorted, rotation=45, ha='right')
     plt.legend()
+    plt.tight_layout()
     plt.show()
 
 def do_plot_go(filename, time, x, optimal, l, r, model):

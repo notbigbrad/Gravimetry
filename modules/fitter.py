@@ -322,31 +322,34 @@ def fitting_dataset(filename, parameters, do_plot=False):
 
     return {'simple': (g_simple, g_simple_standard_deviation), 'differential_equation': (g_differential, g_differential_standard_deviation)}
 
+
 def fitting_g(g):
-    x = np.linspace(0, len(g) - 1, len(g))
-    z = np.linspace(0, len(g) - 1, 1000)
+    # Build the unsorted arrays from the dictionary
+    labels = list(g.keys())
+    x = np.arange(len(g))
+    g_simple_values = np.array([g[label]['simple'] for label in labels])
+    g_differential_values = np.array([g[label]['differential_equation'] for label in labels])
 
-    g_input_simple = np.array([elt['simple'] for elt in g.values()])
-    g_input_differential_equation = np.array([elt['differential_equation'] for elt in g.values()])
+    optimal_simple, covariance_simple = scipy.optimize.curve_fit(
+        linear_function, x, g_simple_values[:, 0], p0=[9.81], sigma=g_simple_values[:, 1],
+        absolute_sigma=True, maxfev=10 ** 9
+    )
+    optimal_differential, covariance_differential = scipy.optimize.curve_fit(
+        linear_function, x, g_differential_values[:, 0], p0=[9.81], sigma=g_differential_values[:, 1],
+        absolute_sigma=True, maxfev=10 ** 9
+    )
 
-    optimal_simple, covariance_simple = scipy.optimize.curve_fit(linear_function, x, g_input_simple.T[0], p0=[9.81], sigma=g_input_simple.T[1],
-                                                   absolute_sigma=True, maxfev=1 * 10 ** 9)
+    g_simple_fit = optimal_simple[0]
+    g_diff_eq_fit = optimal_differential[0]
+    g_err_simple = np.sqrt(np.diag(covariance_simple))[0] / np.sqrt(len(g))
+    g_err_diff_eq = np.sqrt(np.diag(covariance_differential))[0] / np.sqrt(len(g))
 
-    g_simple = optimal_simple[0]
-    g_standard_deviation_simple = np.sqrt(np.diag(covariance_simple))[0]
-    g_standard_error_simple = g_standard_deviation_simple / np.sqrt(len(g))
+    # Plot the results using the sorted order
+    plot_now(x, g_simple_values, g_differential_values, g_simple_fit, g_diff_eq_fit, g_err_simple, g_err_diff_eq,
+             labels)
 
-
-
-    optimal_differential_equation, covariance_differential_equation = scipy.optimize.curve_fit(linear_function, x, g_input_differential_equation.T[0], p0=[9.81],
-                                                                 sigma=g_input_differential_equation.T[1],
-                                                                 absolute_sigma=True, maxfev=1 * 10 ** 9)
-
-    g_differential_equation = optimal_differential_equation[0]
-    g_standard_deviation_differential_equation = np.sqrt(np.diag(covariance_differential_equation))[0]
-    g_standard_error_differential_equation = g_standard_deviation_differential_equation / np.sqrt(len(g))
+    print(f'FINAL g VALUES')
+    print(f'g (Simple): {g_simple_fit:.5f} ± {g_err_simple:.5f} m/s²')
+    print(f'g (Differential Equation): {g_diff_eq_fit:.5f} ± {g_err_diff_eq:.5f} m/s²')
 
 
-    print(f'FINAL g VALUE FOR FIRST DATA USING MATHEMATICAL PENDULUM')
-    print(f'g: {g_simple} +- {g_standard_error_simple} ms^-2 Simple')
-    print(f'g: {g_differential_equation} +- {g_standard_error_differential_equation} ms^-2 ODE')

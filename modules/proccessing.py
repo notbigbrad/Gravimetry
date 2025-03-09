@@ -120,6 +120,9 @@ params_dict = {
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
 
+        'slice_bounds': (0, -1),
+        'capture_rate': 240,
+        'playback_rate': 60,
     #     TODO come back to this
     },
     'MetalRod_2': {
@@ -130,6 +133,10 @@ params_dict = {
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
+
+        'slice_bounds': (0, -1),
+        'capture_rate': 240,
+        'playback_rate': 60,
 
     #     TODO come back to this
     }

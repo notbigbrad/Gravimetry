@@ -2,7 +2,6 @@ from time import time_ns
 
 import numpy as np
 import scipy.optimize
-import matplotlib.pyplot as plt
 from modules.camera_processing import true_position, angle
 from modules.error_propagation import evaluation_with_error, sp
 from modules.modelling import simple_under_damped_pendulum_solution, linear_function, ode_callable_über_wrapper
@@ -57,9 +56,6 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o):
         bounds=bounds
     )
 
-
-
-
     time_space = np.linspace(np.min(time), np.max(time), len(time))
     ode_residuals = subtended_angle - ode_callable_über_wrapper(
         time_space,
@@ -76,7 +72,7 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o):
 
 def double_string_pendulum(p, filename, do_plot=False):
 
-                        # ----------- PRE-PROCESSING  -----------
+    # ----------- PRE-PROCESSING  -----------
 
     time, raw_x, raw_y = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig")[p['slice_bounds'][0]:p['slice_bounds'][1]].T
     time = np.linspace(0, max(time) - min(time), len(time)) / (p['capture_rate'] / p['playback_rate'])
@@ -155,7 +151,12 @@ def double_string_pendulum(p, filename, do_plot=False):
 
     print('stop')
 
-def compound_pendulum(p):
+def compound_pendulum(p, filename, do_plot=False):
+    # ----------- PRE-PROCESSING  -----------
+
+    time, raw_x, raw_y = np.loadtxt(f'../data/{filename}.csv', delimiter=",", encoding="utf-8-sig")[
+                         p['slice_bounds'][0]:p['slice_bounds'][1]].T
+    time = np.linspace(0, max(time) - min(time), len(time)) / (p['capture_rate'] / p['playback_rate'])
 
     if p['ball_diameter'][0] != 0:
 
@@ -183,6 +184,7 @@ def compound_pendulum(p):
 
 
     ball_radius_standard_deviation = np.sqrt(ball_radius_variance)
+
 
     m, l = sp.symbols('m l')
     expr_rod_linear_density = m / l
@@ -230,6 +232,22 @@ def compound_pendulum(p):
     )
 
     radius_centre_of_mass_standard_deviation = np.sqrt(radius_centre_of_mass_variance)
+
+    m_b, d_b, t_r, r_0, m_r = sp.symbols('m_b d_b t_r r_0 m_r')
+    expr_δ = sp.asin((m_b * (d_b + t_r)) / (2 * r_0 * (m_b + m_r)))
+
+    δ, δ_variance = evaluation_with_error(
+        my_function=expr_δ,
+        ball_mass=[p['ball_mass'], Dependence.INDEPENDENT, m_b],
+        ball_diameter=[p['ball_diameter'], Dependence.INDEPENDENT, d_b],
+        rod_thickness=[p['rod_thickness'], Dependence.INDEPENDENT, t_r],
+        radius_centre_of_mass=[[radius_centre_of_mass,radius_centre_of_mass_standard_deviation], Dependence.INDEPENDENT, r_0],
+        rod_mass=[p['rod_mass'], Dependence.INDEPENDENT, m_r]
+    )
+
+    δ_standard_deviation = np.sqrt(δ_variance)
+
+    subtended_angle = np.asin(raw_x / p['rod_length'][0] + p['distance_to_pivot'][0]) - δ
 
     return radius_centre_of_mass, radius_centre_of_mass_standard_deviation, moment_of_inertia, moment_of_inertia_standard_deviation
 

@@ -9,7 +9,7 @@ from modules.Enums_and_constants import Experiment
 fileNames = os.listdir('../data/')
 REGEX_PATTERN = r"^raw__.+\.csv$"
 g = {}
-DO_PLOT = False
+DO_PLOT = True
 # ---PARAMETER CONFIG---
 
 # sets 1,2 performed on 23/02/25

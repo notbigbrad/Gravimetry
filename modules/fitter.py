@@ -21,22 +21,10 @@ def simple_solution_fitting(time, subtended_angle, effective_length):
         maxfev=1E9
     )
 
-    # fitted_curve = simple_under_damped_pendulum_solution(time, *simple_optimal)
-    #
-    # # Plot results
-    # plt.figure(figsize=(8, 5))
-    # plt.scatter(time, subtended_angle, label="Data", color="red", s=10)
-    # plt.plot(time, fitted_curve, label="Fitted Curve", color="blue")
-    # plt.xlabel("Time (s)")
-    # plt.ylabel("Subtended Angle (rad)")
-    # plt.legend()
-    # plt.title("Pendulum Motion Fit")
-    # plt.grid()
-    # plt.show()
+    def simple_fitted_model(t):
+        return simple_under_damped_pendulum_solution(t, *simple_optimal)
 
 
-    # gamma = simple_optimal[1]
-    # omega = simple_optimal[2]
 
     time_space = np.linspace(np.min(time), np.max(time), len(time))
     simple_residuals = subtended_angle - simple_under_damped_pendulum_solution(
@@ -47,7 +35,8 @@ def simple_solution_fitting(time, subtended_angle, effective_length):
         simple_optimal[3]   # Residuals
     )
 
-    return simple_optimal, simple_covariance_matrix, simple_residuals
+
+    return simple_optimal, simple_covariance_matrix, simple_residuals, simple_fitted_model
 
 def ode_solution_fitting(time, subtended_angle, I, m, r_o):
 
@@ -68,20 +57,17 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o):
         bounds=bounds
     )
 
-    # fitted_curve = ode_callable_über_wrapper(
-    #     time, *ode_optimal, I_given=I, m_given=m, r_o_given=r_o
-    # )
-    #
-    # # Plot results
-    # plt.figure(figsize=(8, 5))
-    # plt.scatter(time, subtended_angle, label="Data", color="red", s=10)
-    # plt.plot(time, fitted_curve, label="Fitted Curve", color="blue")
-    # plt.xlabel("Time (s)")
-    # plt.ylabel("Subtended Angle (rad)")
-    # plt.legend()
-    # plt.title("ODE Model Fit to Pendulum Data")
-    # plt.grid()
-    # plt.show()
+    def ode_fitted_model(t):
+        return ode_callable_über_wrapper(
+            t,
+            ode_optimal[0],
+            ode_optimal[1],
+            ode_optimal[2],
+            ode_optimal[3],
+            I_given=I,
+            m_given=m,
+            r_o_given=r_o
+        )
 
     time_space = np.linspace(np.min(time), np.max(time), len(time))
     ode_residuals = subtended_angle - ode_callable_über_wrapper(
@@ -95,7 +81,7 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o):
         r_o_given=r_o
     )
 
-    return ode_optimal, ode_covariance_matrix, ode_residuals
+    return ode_optimal, ode_covariance_matrix, ode_residuals, ode_fitted_model
 
 def double_string_pendulum(p, filename, do_plot=False):
 
@@ -150,7 +136,7 @@ def double_string_pendulum(p, filename, do_plot=False):
 
         # 1. ---------- Simple Solution Fitter -----------
 
-    simple_parameters, simple_covariance_matrix, simple_residuals = simple_solution_fitting(
+    simple_parameters, simple_covariance_matrix, simple_residuals, simple_fitted_model = simple_solution_fitting(
         time,
         subtended_angle,
         radius_centre_of_mass
@@ -158,7 +144,7 @@ def double_string_pendulum(p, filename, do_plot=False):
 
     # 2. ---------- Coupled ODE Solution Fitter -----------
 
-    ode_parameters, ode_covariance_matrix, ode_residuals = ode_solution_fitting(
+    ode_parameters, ode_covariance_matrix, ode_residuals, ode_fitted_model = ode_solution_fitting(
         time,
         subtended_angle,
         moment_of_inertia,
@@ -169,8 +155,17 @@ def double_string_pendulum(p, filename, do_plot=False):
     # ----------- PLOTTING (OPTIONAL) -----------
 
     if do_plot:
-        do_plot_go(filename, time, subtended_angle, simple_parameters, effective_length, simple_residuals,
-                   simple_under_damped_pendulum_solution)
+        do_plot_go(
+            filename,
+            time,
+            subtended_angle,
+            simple_parameters,
+            simple_residuals,
+            simple_fitted_model,
+            ode_parameters,
+            ode_residuals,
+            ode_fitted_model
+        )
 
 
     return [simple_parameters, simple_covariance_matrix], [ode_parameters, ode_covariance_matrix],  [radius_centre_of_mass, radius_centre_of_mass_standard_deviation]
@@ -182,6 +177,7 @@ def compound_pendulum(p, filename, do_plot=False):
                          p['slice_bounds'][0]:p['slice_bounds'][1]].T
     time = np.linspace(0, max(time) - min(time), len(time)) / (p['capture_rate'] / p['playback_rate'])
 
+    # ----------- PARAMETER BUILDER  -----------
 
     l_r, Δp, d_b, t_r = sp.symbols('l_r Δp d_b t_r')
     expr_ball_offset = sp.sqrt((l_r + Δp) ** 2 + ((d_b + t_r)/ 2) ** 2)
@@ -257,7 +253,7 @@ def compound_pendulum(p, filename, do_plot=False):
 
     # 1. ---------- Simple Solution Fitter -----------
 
-    simple_parameters, simple_covariance_matrix, simple_residuals = simple_solution_fitting(
+    simple_parameters, simple_covariance_matrix, simple_residuals, simple_fitted_model = simple_solution_fitting(
         time,
         subtended_angle,
         radius_centre_of_mass
@@ -265,7 +261,7 @@ def compound_pendulum(p, filename, do_plot=False):
 
     # 2. ---------- Coupled ODE Solution Fitter -----------
 
-    ode_parameters, ode_covariance_matrix, ode_residuals = ode_solution_fitting(
+    ode_parameters, ode_covariance_matrix, ode_residuals, ode_fitted_model = ode_solution_fitting(
         time,
         subtended_angle,
         moment_of_inertia,
@@ -276,8 +272,17 @@ def compound_pendulum(p, filename, do_plot=False):
     # ----------- PLOTTING (OPTIONAL) -----------
 
     if do_plot:
-        do_plot_go(filename, time, subtended_angle, simple_parameters, radius_centre_of_mass, simple_residuals,
-                   simple_under_damped_pendulum_solution)
+        do_plot_go(
+            filename,
+            time,
+            subtended_angle,
+            simple_parameters,
+            simple_residuals,
+            simple_under_damped_pendulum_solution,
+            ode_parameters,  # Add ODE parameters
+            ode_residuals,  # Add ODE residuals
+            ode_solution_fitting  # Add ODE solution function
+        )
 
     return [simple_parameters, simple_covariance_matrix], [ode_parameters, ode_covariance_matrix], [radius_centre_of_mass, radius_centre_of_mass_standard_deviation]
 

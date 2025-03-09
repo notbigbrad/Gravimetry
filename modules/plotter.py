@@ -35,27 +35,72 @@ def plot_now(x, g_simple_values, g_differential_values, g_simple, g_diff_eq, g_e
                 label=f'Fit (Diff Eq): {g_diff_eq:.5f} ± {g_err_diff_eq:.1g} m/s²')
     plt.axhline(y=9.81616, color='green', linestyle='-', label='Theoretical Local g')
 
-    # Set x-axis ticks and labels
     plt.xticks(x_sorted, labels_sorted, rotation=45, ha='right')
     plt.legend()
     plt.tight_layout()
     plt.show()
 
-def do_plot_go(filename, time, x, optimal, l, r, model):
 
-    tSpace = np.linspace(np.min(time), np.max(time), 10000)
-    plt.figure(figsize=[15, 10])
-    plt.title(filename)
-    plt.axis("off")
-    plt.subplot(211)
-    plt.suptitle("Data Plot with Fitted Model")
-    plt.fill_between(time, x - 0.00872665, x + 0.00872665, color="lightgray") # <--- using half a degree as error, might revise later
-    plt.scatter(time, x, color="red", marker="+", linewidths=1, label="Data")
-    plt.plot(tSpace, model(tSpace, optimal[0], optimal[1], optimal[2], optimal[3]), label="Mathematical Pendulum Model")
-    plt.plot(tSpace, sin(tSpace, np.sqrt(9.81 / l), 0, optimal[0]), "g--", label="Theoretical")
-    plt.legend()
-    plt.subplot(212)
-    plt.suptitle("Residual Plot")
-    plt.plot(time, x * 0.05, color="lightgray")
-    plt.plot(time, r, color="black")
+def do_plot_go(filename, time, subtended_angle, simple_parameters,
+               simple_residuals, simple_fitted_model, ode_parameters, ode_residuals, ode_fitted_model):
+
+    fig, axs = plt.subplots(2, 2, figsize=(14, 10), sharex=True)
+
+    # Dense time array for smooth fitted curves.
+    t_dense = np.linspace(np.min(time), np.max(time), 300)
+
+    # ---------------------- Simple Fit Plot ----------------------
+    axs[0, 0].plot(time, subtended_angle, 'ko', label='Data', markersize=4)
+    axs[0, 0].plot(t_dense, simple_fitted_model(t_dense), 'b-', label='Simple Fit')
+
+    param_text_simple = (
+        "Simple Fit Parameters:\n"
+        "A0 = {:.3f}\n"
+        "gamma = {:.3f}\n"
+        "omega = {:.3f}\n"
+        "phi = {:.3f}"
+    ).format(*simple_parameters)
+
+    axs[0, 0].text(0.02, 0.98, param_text_simple, transform=axs[0, 0].transAxes,
+                   fontsize=9, verticalalignment='top',
+                   bbox=dict(facecolor='white', alpha=0.7))
+    axs[0, 0].set_title(f"Simple Fit (Centre of Mass Radius: {filename})")
+    axs[0, 0].set_ylabel("Subtended Angle")
+    axs[0, 0].legend()
+
+    # ---------------------- ODE Fit Plot ----------------------
+    axs[0, 1].plot(time, subtended_angle, 'ko', label='Data', markersize=4)
+    axs[0, 1].plot(t_dense, ode_fitted_model(t_dense), 'r-', label='ODE Fit')
+
+    param_text_ode = (
+        "ODE Fit Parameters:\n"
+        "θ0 = {:.3f}\n"
+        "omega = {:.3f}\n"
+        "b = {:.3f}\n"
+        "g = {:.3f}"
+    ).format(*ode_parameters)
+
+    axs[0, 1].text(0.02, 0.98, param_text_ode, transform=axs[0, 1].transAxes,
+                   fontsize=9, verticalalignment='top',
+                   bbox=dict(facecolor='white', alpha=0.7))
+    axs[0, 1].set_title(f"ODE Fit (Centre of Mass Radius: {filename})")
+    axs[0, 1].legend()
+
+    # ---------------------- Simple Residuals Plot ----------------------
+    axs[1, 0].plot(time, simple_residuals, 'b.', label='Simple Residuals')
+    axs[1, 0].axhline(0, color='k', linestyle='--')
+    axs[1, 0].set_title("Simple Residuals")
+    axs[1, 0].set_xlabel("Time")
+    axs[1, 0].set_ylabel("Residual")
+    axs[1, 0].legend()
+
+    # ---------------------- ODE Residuals Plot ----------------------
+    axs[1, 1].plot(time, ode_residuals, 'r.', label='ODE Residuals')
+    axs[1, 1].axhline(0, color='k', linestyle='--')
+    axs[1, 1].set_title("ODE Residuals")
+    axs[1, 1].set_xlabel("Time")
+    axs[1, 1].set_ylabel("Residual")
+    axs[1, 1].legend()
+
+    plt.tight_layout()
     plt.show()

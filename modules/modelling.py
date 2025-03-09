@@ -33,14 +33,6 @@ def ode_callable_über_wrapper(t, θ_initial, ω, b, g, I_given, m_given, r_o_gi
 
         soln = scipy.integrate.solve_ivp(physical_odes, (t[0], t[-1]), [θ_initial, ω], t_eval=t, method="RK45")
 
-        # plt.figure(figsize=(8, 4))
-        # plt.plot(t, soln.y[0], label=r'$\theta(t)$')
-        # plt.xlabel("Time (s)")
-        # plt.ylabel("Theta (radians)")
-        # plt.title("Theta vs Time")
-        # plt.legend()
-        # plt.grid(True)
-        # plt.show()
 
         return soln.y[0]
 

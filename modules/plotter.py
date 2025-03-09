@@ -5,12 +5,18 @@ import matplotlib.pyplot as plt
 def plot_now(x, z, f, g_dict, fitted_g, g_standard_deviation, g_standard_error):
     g = np.array([
         # g_dict['MetalRod_1'],
-        g_dict['DoublePendulum1m_1'],
-        g_dict['DoublePendulum1m_2'],
-        g_dict['DoublePendulum1.5m_1'],
-        g_dict['DoublePendulum1.5m_2'],
-        g_dict['DoublePendulum2m_1'],
-        g_dict['DoublePendulum2m_2']
+        g_dict['DoublePendulum1m_1']['simple'],
+        g_dict['DoublePendulum1m_1']['differential_equation'],
+        g_dict['DoublePendulum1m_2']['simple'],
+        g_dict['DoublePendulum1m_2']['differential_equation'],
+        g_dict['DoublePendulum1.5m_1']['simple'],
+        g_dict['DoublePendulum1.5m_1']['differential_equation'],
+        g_dict['DoublePendulum1.5m_2']['simple'],
+        g_dict['DoublePendulum1.5m_2']['differential_equation'],
+        g_dict['DoublePendulum2m_1']['simple'],
+        g_dict['DoublePendulum2m_1']['differential_equation'],
+        g_dict['DoublePendulum2m_2']['simple'],
+        g_dict['DoublePendulum2m_2']['differential_equation']
     ])
 
 

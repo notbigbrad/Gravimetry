@@ -9,7 +9,7 @@ from modules.Enums_and_constants import Experiment
 fileNames = os.listdir('../data/')
 REGEX_PATTERN = r"^raw__.+\.csv$"
 g = {}
-DO_PLOT = True
+DO_PLOT = False
 # ---PARAMETER CONFIG---
 
 # sets 1,2 performed on 23/02/25
@@ -114,7 +114,7 @@ params_dict = {
     'MetalRod_1': {
         'rod_length': (1, 0.5E-3),
         'distance_to_pivot': (4E-3, 0.02E-3),
-        'rod_thickness': (1.8E-3, 0.02E-3),
+        'rod_thickness': (0,0),
         'rod_mass': (142.8E-3, 0.2E-3),
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
@@ -122,13 +122,13 @@ params_dict = {
 
         'slice_bounds': (0, -1),
         'capture_rate': 240,
-        'playback_rate': 60,
+        'playback_rate': 29.97,
     #     TODO come back to this
     },
     'MetalRod_2': {
         'rod_length': (1, 0.5E-3),
         'distance_to_pivot': (4E-3, 0.02E-3),
-        'rod_thickness': (1.8E-3, 0.02E-3),
+        'rod_thickness': (0, 0),
         'rod_mass': (142.8E-3, 0.2E-3),
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
@@ -136,9 +136,37 @@ params_dict = {
 
         'slice_bounds': (0, -1),
         'capture_rate': 240,
-        'playback_rate': 60,
+        'playback_rate': 29.97,
 
     #     TODO come back to this
+    },
+    'WoodenRod_1': {
+        'rod_length': (1, 4E-3),
+        'distance_to_pivot': (9.5E-3, 0.02E-3),
+        'rod_thickness': (5.4E-3, 0.02E-3),
+        'rod_mass': (111.6E-3, 0.2E-3),
+        'ball_diameter': (30E-3, 0.02E-3),
+        'ball_mass': (109.0E-3, 0.2E-3),
+        'method': Experiment.COMPOUND_PENDULUM,
+
+        'slice_bounds': (0, -1),
+        'capture_rate': 240,
+        'playback_rate': 60,
+
+
+    },
+    'WoodenRod_2': {
+        'rod_length': (1, 4E-3),
+        'distance_to_pivot': (9.5E-3, 0.02E-3),
+        'rod_thickness': (5.4E-3, 0.02E-3),
+        'rod_mass': (111.6E-3, 0.2E-3),
+        'ball_diameter': (30E-3, 0.02E-3),
+        'ball_mass': (109.0E-3, 0.2E-3),
+        'method': Experiment.COMPOUND_PENDULUM,
+
+        'slice_bounds': (0, -1),
+        'capture_rate': 240,
+        'playback_rate': 60,
     }
 }
 

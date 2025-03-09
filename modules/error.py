@@ -1,5 +1,4 @@
 import numpy
-import scipy
 
 def prop(m, c):
     M = numpy.array(m)

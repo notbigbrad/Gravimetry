@@ -1,5 +1,4 @@
 import numpy as np
-import scipy
 
 def truePos(coord, pixelSize, resolution, f, z):
     
@@ -10,13 +9,13 @@ def truePos(coord, pixelSize, resolution, f, z):
     centre = np.array(resolution)/2*pixelSize
     
     for i in np.array(coord).T:
+        # Extract pixel coordinate
         p = np.array(i)
 
         # Convert pixel index to distance
         x, y = (p*pixelSize - centre)
 
-        # truex.append(-((x * f)/(z - f)))
-        # truey.append(-((y * f)/(z - f)))
+        # Calculate true positions
         truex.append(x - (z*x)/(f))
         truey.append(y - (z*y)/(f))
 

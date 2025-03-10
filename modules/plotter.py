@@ -46,7 +46,6 @@ def do_plot_go(filename, time, subtended_angle, simple_parameters,
 
     fig, axs = plt.subplots(2, 2, figsize=(14, 10), sharex=True)
 
-    # Dense time array for smooth fitted curves.
     t_dense = np.linspace(np.min(time), np.max(time), 300)
 
     # ---------------------- Simple Fit Plot ----------------------

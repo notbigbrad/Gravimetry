@@ -24,8 +24,6 @@ def simple_solution_fitting(time, subtended_angle, effective_length):
     def simple_fitted_model(t):
         return simple_under_damped_pendulum_solution(t, *simple_optimal)
 
-
-
     time_space = np.linspace(np.min(time), np.max(time), len(time))
     simple_residuals = subtended_angle - simple_under_damped_pendulum_solution(
         time_space,
@@ -243,7 +241,7 @@ def compound_pendulum(p, filename, do_plot=False):
 
     if p['ball_mass'][0] != 0:
         k_factor = (p['ball_mass'][0]) / (2 * (p['ball_mass'][0] + p['rod_mass'][0]))
-        subtended_angle = np.asin ( k_factor * (raw_x - (p['ball_diameter'][0] + p['rod_thickness'][0]))  / radius_centre_of_mass)
+        subtended_angle = np.asin ( (k_factor * (raw_x - (p['ball_diameter'][0] + p['rod_thickness'][0])))  / radius_centre_of_mass)
     else:
         subtended_angle = np.asin ((raw_x / 2)/radius_centre_of_mass)
 
@@ -258,6 +256,8 @@ def compound_pendulum(p, filename, do_plot=False):
         subtended_angle,
         radius_centre_of_mass
     )
+
+
 
     # 2. ---------- Coupled ODE Solution Fitter -----------
 
@@ -278,10 +278,10 @@ def compound_pendulum(p, filename, do_plot=False):
             subtended_angle,
             simple_parameters,
             simple_residuals,
-            simple_under_damped_pendulum_solution,
+            simple_fitted_model,
             ode_parameters,  # Add ODE parameters
             ode_residuals,  # Add ODE residuals
-            ode_solution_fitting  # Add ODE solution function
+            ode_fitted_model  # Add ODE solution function
         )
 
     return [simple_parameters, simple_covariance_matrix], [ode_parameters, ode_covariance_matrix], [radius_centre_of_mass, radius_centre_of_mass_standard_deviation]

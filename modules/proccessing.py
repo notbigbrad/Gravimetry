@@ -151,7 +151,7 @@ params_dict = {
 
         'slice_bounds': (0, -1),
         'capture_rate': 240,
-        'playback_rate': 60,
+        'playback_rate': 29.97,
 
 
     },
@@ -166,7 +166,7 @@ params_dict = {
 
         'slice_bounds': (0, -1),
         'capture_rate': 240,
-        'playback_rate': 60,
+        'playback_rate': 29.97,
     }
 }
 

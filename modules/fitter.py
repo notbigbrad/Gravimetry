@@ -15,7 +15,7 @@ def simple_solution_fitting(time, subtended_angle, effective_length):
         simple_under_damped_pendulum_solution,
         time,
         subtended_angle,
-        p0=[0.03, 0.1, np.sqrt(9.81 / effective_length), np.pi / 4],  # <-- initial guesses : A0, gamma, omega, phi
+        p0=[0.03, 0.1, np.sqrt(9.81 / effective_length), 0.0052],  # <-- initial guesses : A0, gamma, omega, phi
         bounds=bounds,
         absolute_sigma=False,
         maxfev=1E9
@@ -40,7 +40,7 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o):
 
 
 
-    bounds = [[-np.pi,0,0.0001,6],[np.pi,4,3,11]]
+    bounds = [[-np.pi,0,0,6],[np.pi,10,3,11]]
 
     ode_optimal, ode_covariance_matrix = scipy.optimize.curve_fit(
         lambda t, θ_initial, ω, b, g: ode_callable_über_wrapper(
@@ -51,7 +51,7 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o):
         ),
         time,
         subtended_angle,
-        p0=[0.04, 1, 0.02, 9] ,     # < --- initial guesses : θ_initial, ω_initial, b, g
+        p0=[0.007, 1.2, 0.01, 9.816] ,     # < --- initial guesses : θ_initial, ω_initial, b, g
         bounds=bounds
     )
 
@@ -239,13 +239,11 @@ def compound_pendulum(p, filename, do_plot=False):
     radius_centre_of_mass_standard_deviation = np.sqrt(radius_centre_of_mass_variance)
 
 
-    if p['ball_mass'][0] != 0:
-        k_factor = (p['ball_mass'][0]) / (2 * (p['ball_mass'][0] + p['rod_mass'][0]))
-        subtended_angle = np.asin ( (k_factor * (raw_x - (p['ball_diameter'][0] + p['rod_thickness'][0])))  / radius_centre_of_mass)
-    else:
-        subtended_angle = np.asin ((raw_x / 2)/radius_centre_of_mass)
+    k_factor = (p['ball_mass'][0]) / (2 * (p['ball_mass'][0] + p['rod_mass'][0]))
+    subtended_angle = np.asin ( k_factor * raw_x / radius_centre_of_mass )
 
-    subtended_angle -= np.mean(subtended_angle)
+
+    # subtended_angle -= np.mean(subtended_angle)
 
     # ----------- FITTING & RESIDUALS -----------
 

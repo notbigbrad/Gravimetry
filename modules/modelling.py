@@ -31,7 +31,7 @@ def ode_callable_über_wrapper(t, θ_initial, ω, b, g, I_given, m_given, r_o_gi
 
             return [dθdt, dωdt]
 
-        soln = scipy.integrate.solve_ivp(physical_odes, (t[0], t[-1]), [θ_initial, ω], t_eval=t)
+        soln = scipy.integrate.solve_ivp(physical_odes, (t[0], t[-1]), [θ_initial, ω], t_eval=t, method="DOP853")
 
 
         return soln.y[0]

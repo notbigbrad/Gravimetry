@@ -352,7 +352,7 @@ def fitting_g(g):
              labels)
 
     print(f'FINAL g VALUES')
-    print(f'g (Simple): {g_simple_fit:.5f} ± {g_err_simple:.5f} m/s²')
-    print(f'g (Differential Equation): {g_diff_eq_fit:.5f} ± {g_err_diff_eq:.5f} m/s²')
+    print(f'g (Simple): {g_simple_fit:.5f} ± {g_err_simple:.1g} m/s²')
+    print(f'g (Differential Equation): {g_diff_eq_fit:.5f} ± {g_err_diff_eq:.1g} m/s²')
 
 

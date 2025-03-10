@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 def plot_now(x, g_simple_values, g_differential_values, g_simple, g_diff_eq, g_err_simple, g_err_diff_eq, labels):
 
     def get_sort_key(label):
+        if "Rod_" in label:
+            return (float('inf'), int(label.split("Rod_")[-1]))
         parts = label.replace("DoublePendulum", "")
         x_part, y_part = parts.split("m_")
         return (float(x_part), int(y_part))
@@ -39,6 +41,7 @@ def plot_now(x, g_simple_values, g_differential_values, g_simple, g_diff_eq, g_e
     plt.legend()
     plt.tight_layout()
     plt.show()
+
 
 
 def do_plot_go(filename, time, subtended_angle, simple_parameters,

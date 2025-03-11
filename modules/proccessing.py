@@ -27,6 +27,8 @@ params_dict = {
         'ball_diameter': (30E-3, 0.03E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.DOUBLE_STRING,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 1), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
 
         'slice_bounds': (0, -210),
         'capture_rate': 240,
@@ -42,6 +44,8 @@ params_dict = {
         'ball_diameter': (30E-3, 0.03E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.DOUBLE_STRING,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 1), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
 
         'slice_bounds': (200, -10),
         'capture_rate': 240,
@@ -57,6 +61,8 @@ params_dict = {
         'ball_diameter': (30E-3, 0.03E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.DOUBLE_STRING,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 1.5), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
 
         'slice_bounds': (0, -220),
         'capture_rate': 240,
@@ -72,6 +78,8 @@ params_dict = {
         'ball_diameter': (30E-3, 0.03E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.DOUBLE_STRING,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 1.5), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
 
         'slice_bounds': (0, -90),
         'capture_rate': 240,
@@ -87,6 +95,9 @@ params_dict = {
         'ball_diameter': (30E-3, 0.03E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.DOUBLE_STRING,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 2), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
+
 
         'slice_bounds': (0, -310),
         'capture_rate': 240,
@@ -102,6 +113,8 @@ params_dict = {
         'ball_diameter': (30E-3, 0.03E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.DOUBLE_STRING,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 2), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
 
         'slice_bounds': (0, -250),
         'capture_rate': 240,
@@ -119,6 +132,8 @@ params_dict = {
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 0.5), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
 
         'slice_bounds': (0, -1),
         'capture_rate': 240,
@@ -133,6 +148,8 @@ params_dict = {
         'ball_diameter': (0, 0),   # <-- No ball was used in this experiment
         'ball_mass': (0, 0),
         'method': Experiment.COMPOUND_PENDULUM,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 0.5), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
 
         'slice_bounds': (0, -1),
         'capture_rate': 240,
@@ -148,6 +165,8 @@ params_dict = {
         'ball_diameter': (30E-3, 0.02E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.COMPOUND_PENDULUM,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 0.7), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
 
         'slice_bounds': (0, -1),
         'capture_rate': 240,
@@ -163,6 +182,8 @@ params_dict = {
         'ball_diameter': (30E-3, 0.02E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.COMPOUND_PENDULUM,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 0.7), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
 
         'slice_bounds': (0, -1),
         'capture_rate': 240,

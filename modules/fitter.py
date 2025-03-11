@@ -7,7 +7,7 @@ from modules.modelling import simple_under_damped_pendulum_solution, linear_func
 from modules.Enums_and_constants import Experiment, Dependence
 from modules.plotter import plot_now, do_plot_go
 
-def simple_solution_fitting(time, subtended_angle, effective_length):
+def simple_solution_fitting(time, subtended_angle, effective_length, initial_guess):
 
     bounds = [[0.0001, 0.0001, 0.1, -np.pi], [5, 1, 10, np.pi]]
 
@@ -15,7 +15,7 @@ def simple_solution_fitting(time, subtended_angle, effective_length):
         simple_under_damped_pendulum_solution,
         time,
         subtended_angle,
-        p0=[0.03, 0.1, np.sqrt(9.81 / effective_length), 0.0052],  # <-- initial guesses : A0, gamma, omega, phi
+        p0=initial_guess,  # <-- initial guesses : A0, gamma, omega, phi
         bounds=bounds,
         absolute_sigma=False,
         maxfev=1E9
@@ -36,7 +36,7 @@ def simple_solution_fitting(time, subtended_angle, effective_length):
 
     return simple_optimal, simple_covariance_matrix, simple_residuals, simple_fitted_model
 
-def ode_solution_fitting(time, subtended_angle, I, m, r_o):
+def ode_solution_fitting(time, subtended_angle, I, m, r_o, initial_guess):
 
 
 
@@ -51,7 +51,7 @@ def ode_solution_fitting(time, subtended_angle, I, m, r_o):
         ),
         time,
         subtended_angle,
-        p0=[0.007, 1.2, 0.01, 9.816] ,     # < --- initial guesses : θ_initial, ω_initial, b, g
+        p0=initial_guess,     # < --- initial guesses : θ_initial, ω_initial, b, g
         bounds=bounds
     )
 
@@ -134,10 +134,13 @@ def double_string_pendulum(p, filename, do_plot=False):
 
         # 1. ---------- Simple Solution Fitter -----------
 
+    p['initial_guess_simple'][2] = np.sqrt(9.81/ effective_length)
+
     simple_parameters, simple_covariance_matrix, simple_residuals, simple_fitted_model = simple_solution_fitting(
         time,
         subtended_angle,
-        radius_centre_of_mass
+        radius_centre_of_mass,
+        p['initial_guess_simple']
     )
 
     # 2. ---------- Coupled ODE Solution Fitter -----------
@@ -147,7 +150,8 @@ def double_string_pendulum(p, filename, do_plot=False):
         subtended_angle,
         moment_of_inertia,
         p['ball_mass'][0],
-        radius_centre_of_mass
+        radius_centre_of_mass,
+        p['initial_guess_ode']
     )
 
     # ----------- PLOTTING (OPTIONAL) -----------
@@ -247,12 +251,15 @@ def compound_pendulum(p, filename, do_plot=False):
 
     # ----------- FITTING & RESIDUALS -----------
 
-    # 1. ---------- Simple Solution Fitter -----------
+        # 1. ---------- Simple Solution Fitter -----------
+
+    p['initial_guess_simple'][2] = np.sqrt(9.81 / radius_centre_of_mass)
 
     simple_parameters, simple_covariance_matrix, simple_residuals, simple_fitted_model = simple_solution_fitting(
         time,
         subtended_angle,
-        radius_centre_of_mass
+        radius_centre_of_mass,
+        p['initial_guess_simple']
     )
 
 
@@ -264,7 +271,8 @@ def compound_pendulum(p, filename, do_plot=False):
         subtended_angle,
         moment_of_inertia,
         p['ball_mass'][0]+p['rod_mass'][0],
-        radius_centre_of_mass
+        radius_centre_of_mass,
+        p['initial_guess_ode']
     )
 
     # ----------- PLOTTING (OPTIONAL) -----------

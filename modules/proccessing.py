@@ -166,7 +166,7 @@ params_dict = {
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.COMPOUND_PENDULUM,
         'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 0.7), 0.0052],
-        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
+        'initial_guess_ode': [0.007, 1, 0.05, 9.816],
 
         'slice_bounds': (0, -1),
         'capture_rate': 240,

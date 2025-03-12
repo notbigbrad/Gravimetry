@@ -39,8 +39,6 @@ def simple_solution_fitting(time, subtended_angle, effective_length, initial_gue
 
 def ode_solution_fitting(time, subtended_angle, I, m, r_o, initial_guess):
 
-
-
     bounds = [[-np.pi,0,0,6],[np.pi,10,3,11]]
 
     ode_optimal, ode_covariance_matrix = scipy.optimize.curve_fit(
@@ -279,6 +277,14 @@ def compound_pendulum(p, filename, do_plot=False):
         radius_centre_of_mass,
         p['initial_guess_ode']
     )
+
+    # 3. ---------- Monte Carlo Fitter -----------
+
+    prop(time,
+         subtended_angle,
+         [moment_of_inertia, p['ball_mass'][0]+p['rod_mass'][0], radius_centre_of_mass],
+         [moment_of_inertia_standard_deviation,np.sqrt(p['ball_mass'][1] **2 + p['rod_mass'][1]**2), radius_centre_of_mass_standard_deviation],
+         p['initial_guess_ode'])
 
     # ----------- PLOTTING (OPTIONAL) -----------
 

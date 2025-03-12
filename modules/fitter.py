@@ -1,10 +1,10 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.optimize
 from modules.camera_processing import true_position, angle
 from modules.error_propagation import evaluation_with_error, sp
 from modules.modelling import simple_under_damped_pendulum_solution, linear_function, ode_callable_über_wrapper
 from modules.Enums_and_constants import Experiment, Dependence
+from modules.monte_carlo import prop
 from modules.plotter import plot_now, do_plot_go
 
 def simple_solution_fitting(time, subtended_angle, effective_length, initial_guess):
@@ -267,7 +267,7 @@ def compound_pendulum(p, filename, do_plot=False):
 
 
 
-    # 2. ---------- Coupled ODE Solution Fitter -----------
+    # 2. ---------- ODE Solution Fitter -----------
 
     ode_parameters, ode_covariance_matrix, ode_residuals, ode_fitted_model = ode_solution_fitting(
         time,

@@ -16,5 +16,5 @@ def true_position(raw_x, raw_y, pixel_size, resolution, focal_length, z_distance
     return true_x, true_y
 
 def angle(V, P):
-    return np.arctan( (V[0] - P[0]) / (V[1] - P[1]) )
+    return np.arctan((V[0] - P[0]) / (V[1] - P[1]))
 

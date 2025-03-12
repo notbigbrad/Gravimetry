@@ -33,6 +33,7 @@ def simple_solution_fitting(time, subtended_angle, effective_length, initial_gue
         simple_optimal[3]   # Residuals
     )
 
+    print(simple_optimal[2] **2 * effective_length)
 
     return simple_optimal, simple_covariance_matrix, simple_residuals, simple_fitted_model
 
@@ -251,10 +252,7 @@ def compound_pendulum(p, filename, do_plot=False):
     pivot = [np.mean(cm_x), np.mean(y + radius_centre_of_mass)]
     # subtended_angle = np.asin ( k_factor * raw_x / radius_centre_of_mass )
     subtended_angle = angle([cm_x,y],pivot)
-
-
-
-    # subtended_angle -= np.mean(subtended_angle)
+    subtended_angle -= np.mean(subtended_angle)
 
     # ----------- FITTING & RESIDUALS -----------
 

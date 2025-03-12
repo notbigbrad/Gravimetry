@@ -280,7 +280,7 @@ def compound_pendulum(p, filename, do_plot=False):
 
     # 3. ---------- Monte Carlo Fitter -----------
 
-    results, errors, mean_results, stats_results =prop(time,
+    results, errors, summary =prop(time,
          subtended_angle,
          [moment_of_inertia, p['ball_mass'][0]+p['rod_mass'][0], radius_centre_of_mass],
          [moment_of_inertia_standard_deviation,np.sqrt(p['ball_mass'][1] **2 + p['rod_mass'][1]**2), radius_centre_of_mass_standard_deviation],

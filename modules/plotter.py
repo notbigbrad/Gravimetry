@@ -1,9 +1,10 @@
-from modules.modelling import simple_under_damped_pendulum_solution as physical_pendulum, sin, linear_function
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_now(x, g_simple_values, g_differential_values, g_simple, g_diff_eq, g_err_simple, g_err_diff_eq, labels):
+def plot_now(g_simple_values, g_differential_values, g_monte_carlo_values, g_simple, g_diff_eq, g_monte_carlo, g_err_simple, g_err_diff_eq, g_err_monte_carlo, labels):
+
+    print(g_monte_carlo_values, g_err_monte_carlo)
 
     def get_sort_key(label):
         if "Rod_" in label:
@@ -19,6 +20,7 @@ def plot_now(x, g_simple_values, g_differential_values, g_simple, g_diff_eq, g_e
     x_sorted = np.arange(len(sorted_labels))
     g_simple_sorted = np.array(g_simple_values)[sorted_indices]
     g_differential_sorted = np.array(g_differential_values)[sorted_indices]
+    g_monte_carlo_sorted = np.array(g_monte_carlo_values)[sorted_indices]
     labels_sorted = [labels[i] for i in sorted_indices]
 
     plt.figure(figsize=(12, 6))
@@ -30,12 +32,16 @@ def plot_now(x, g_simple_values, g_differential_values, g_simple, g_diff_eq, g_e
                  label='Simple Model', color='red', capsize=5)
     plt.errorbar(x_sorted, g_differential_sorted[:, 0], yerr=g_differential_sorted[:, 1], fmt='s',
                  label='Differential Equation Model', color='blue', capsize=5)
+    plt.errorbar(x_sorted, g_monte_carlo_sorted[:, 0], yerr=g_monte_carlo_sorted[:, 1], fmt='^',
+                 label='Monte Carlo Model', color='green', capsize=5)
 
     plt.axhline(y=g_simple, color='red', linestyle='--',
                 label=f'Fit (Simple): {g_simple:.5f} ± {g_err_simple:.1g} m/s²')
     plt.axhline(y=g_diff_eq, color='blue', linestyle='-.',
                 label=f'Fit (Diff Eq): {g_diff_eq:.5f} ± {g_err_diff_eq:.1g} m/s²')
-    plt.axhline(y=9.81616, color='green', linestyle='-', label='Theoretical Local g')
+    plt.axhline(y=g_monte_carlo, color='green', linestyle='-',
+                label=f'Fit (Monte Carlo): {g_monte_carlo:.5f} ± {g_err_monte_carlo:.1g} m/s²')
+    plt.axhline(y=9.81616, color='black', linestyle='-', label='Theoretical Local g')
 
     plt.xticks(x_sorted, labels_sorted, rotation=45, ha='right')
     plt.legend()

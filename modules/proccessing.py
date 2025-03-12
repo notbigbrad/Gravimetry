@@ -197,16 +197,16 @@ params_dict = {
         'ball_diameter': (25E-3, 0.5E-3),
         'ball_mass': (65.6E-3, 0.2E-3),
         'method': Experiment.COMPOUND_PENDULUM,
-        'initial_guess_simple': [0.007, 0.1, np.sqrt(9.81 / 0.7), 0.007],
+        'initial_guess_simple': [0.5, 0.01, np.sqrt(9.81 / 0.7), -0.007],
         'initial_guess_ode': [-0.007, 1, 0.01, 9.816],
 
-        'slice_bounds': (0, -1),
+        'slice_bounds': (100, -1),
         'capture_rate': 120,
-        'playback_rate':29.97,
-        'focal_length':24E-3,
+        'playback_rate':30,
+        'focal_length':4.15E-3,
         'resolution': (1920, 1080),
         'pixel_size': tuple(np.array([2.54E-2, 3.2512E-2]) / [1920, 1080]),
-        'z_distance': 230E-3
+        'z_distance': 260E-3
     }
 }
 

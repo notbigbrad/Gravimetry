@@ -6,7 +6,7 @@ from joblib import Parallel, delayed, parallel_backend
 from datetime import datetime as dt
 from scipy import stats, optimize, integrate
 
-def plot_results(time, results, errors):
+def plot_results(filename, time, results, errors):
     results = np.array(results)
     errors = np.array(errors)
 
@@ -20,7 +20,7 @@ def plot_results(time, results, errors):
     fig, ax = plt.subplots(1, 2, figsize=(14, 5))
 
     # Time Series Plot
-    ax[0].plot(time, results, label='Simulated Results', alpha=0.7, color='b')
+    ax[0].plot(time, results, label=f'Simulated Results: {filename}', alpha=0.7, color='b')
     ax[0].fill_between(time, results - errors, results + errors, color='b', alpha=0.3, label="Error Margin")
     ax[0].set_xlabel("Time")
     ax[0].set_ylabel("Subtended Angle")
@@ -65,7 +65,7 @@ def ode_callable_über_wrapper(t, θ_initial, ω, b, g, I_given, m_given, r_o_gi
 def prop(time, subtended_angle, constants, constants_std, p0, n=1e3, processors=None, **kwargs):
 
     if processors is None:
-        processors = max(1, multiprocessing.cpu_count() - 2)
+        processors = max(1, multiprocessing.cpu_count() - 1)
 
     def ODE_wrapper(i, arrays, x, y):
         optimal, covariance = optimize.curve_fit(

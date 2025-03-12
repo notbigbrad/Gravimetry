@@ -179,6 +179,9 @@ def compound_pendulum(p, filename, do_plot=False):
                          p['slice_bounds'][0]:p['slice_bounds'][1]].T
     time = np.linspace(0, max(time) - min(time), len(time)) / (p['capture_rate'] / p['playback_rate'])
 
+    x, y = true_position(raw_x, raw_y, pixel_size=p['pixel_size'], resolution=p['resolution'],
+                         focal_length=p['focal_length'], z_distance=p['z_distance'])
+
     # ----------- PARAMETER BUILDER  -----------
 
     l_r, Δp, d_b, t_r = sp.symbols('l_r Δp d_b t_r')
@@ -244,7 +247,11 @@ def compound_pendulum(p, filename, do_plot=False):
 
 
     k_factor = (p['ball_mass'][0]) / (2 * (p['ball_mass'][0] + p['rod_mass'][0]))
-    subtended_angle = np.asin ( k_factor * raw_x / radius_centre_of_mass )
+    cm_x = k_factor * raw_x
+    pivot = [np.mean(cm_x), np.mean(y + radius_centre_of_mass)]
+    # subtended_angle = np.asin ( k_factor * raw_x / radius_centre_of_mass )
+    subtended_angle = angle([cm_x,y],pivot)
+
 
 
     # subtended_angle -= np.mean(subtended_angle)

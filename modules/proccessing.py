@@ -165,7 +165,7 @@ params_dict = {
         'ball_diameter': (30E-3, 0.02E-3),
         'ball_mass': (109.0E-3, 0.2E-3),
         'method': Experiment.COMPOUND_PENDULUM,
-        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 0.7), 0.0052],
+        'initial_guess_simple': [1 , 0.1, np.sqrt(9.81 / 0.7), 0.0052],
         'initial_guess_ode': [0.007, 1, 0.05, 9.816],
 
         'slice_bounds': (0, -1),
@@ -188,6 +188,25 @@ params_dict = {
         'slice_bounds': (0, -1),
         'capture_rate': 240,
         'playback_rate': 29.97,
+    },
+'MetalRod_3': {
+        'rod_length': (1.015, 0.5E-3),
+        'distance_to_pivot': (3.1E-2, 0.5E-3),
+        'rod_thickness': (6.2E-3, 0.5E-3),
+        'rod_mass': (143.2E-3, 0.2E-3),
+        'ball_diameter': (25E-3, 0.5E-3),
+        'ball_mass': (65.6E-3, 0.2E-3),
+        'method': Experiment.COMPOUND_PENDULUM,
+        'initial_guess_simple': [0.03, 0.1, np.sqrt(9.81 / 0.7), 0.0052],
+        'initial_guess_ode': [0.007, 1.2, 0.01, 9.816],
+
+        'slice_bounds': (0, -1),
+        'capture_rate': 182.34,
+        'playback_rate':45.59,
+        'focal_length':4.15,
+        'resolution': (1920, 1080),
+        'pixel_size': (1.22E-6, 1.22E-6),
+        'z_distance': 230E-3
     }
 }
 
@@ -207,3 +226,11 @@ fitting_g(g)
 
 
 
+# focal length roughly 4.15 mm for today's experiment
+# 'pixel_size': 1 x 3 inch sensor, 1080p probably - PIXEL SIZE IS 1.22 micrometers
+
+
+
+# find true x for the ball track
+# convert to cm frame of reference with k factor
+# then find pivot, then subtended angle from brad's func

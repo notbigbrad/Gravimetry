@@ -4,7 +4,7 @@ from modules.camera_processing import true_position, angle
 from modules.error_propagation import evaluation_with_error, sp
 from modules.modelling import simple_under_damped_pendulum_solution, linear_function, ode_callable_über_wrapper
 from modules.Enums_and_constants import Experiment, Dependence
-from modules.monte_carlo import prop
+from modules.monte_carlo import prop, plot_results
 from modules.plotter import plot_now, do_plot_go
 
 def simple_solution_fitting(time, subtended_angle, effective_length, initial_guess):
@@ -280,11 +280,13 @@ def compound_pendulum(p, filename, do_plot=False):
 
     # 3. ---------- Monte Carlo Fitter -----------
 
-    prop(time,
+    results, errors, mean_results, stats_results =prop(time,
          subtended_angle,
          [moment_of_inertia, p['ball_mass'][0]+p['rod_mass'][0], radius_centre_of_mass],
          [moment_of_inertia_standard_deviation,np.sqrt(p['ball_mass'][1] **2 + p['rod_mass'][1]**2), radius_centre_of_mass_standard_deviation],
          p['initial_guess_ode'])
+
+    plot_results(time, results, errors)
 
     # ----------- PLOTTING (OPTIONAL) -----------
 

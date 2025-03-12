@@ -203,7 +203,7 @@ params_dict = {
         'slice_bounds': (0, -1),
         'capture_rate': 120,
         'playback_rate':29.97,
-        'focal_length':4.15E-3,
+        'focal_length':24E-3,
         'resolution': (1920, 1080),
         'pixel_size': tuple(np.array([2.54E-2, 3.2512E-2]) / [1920, 1080]),
         'z_distance': 230E-3
